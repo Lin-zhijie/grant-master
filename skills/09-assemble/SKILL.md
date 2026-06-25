@@ -120,7 +120,15 @@ workflow/07_outline/source_allocation.yaml   # 如需检查证据一致性
 
 ### 6.1 遍历顺序
 
-深度优先遍历 section tree。对每个 section：
+**组装前，首先在文档最开头输出申请书名称作为一级标题**：
+
+```markdown
+# 申请书名称
+```
+
+标题文字来源：优先从 `outline_report.md` 中提取项目名称/申请书标题；若未找到，则从项目根目录 `topic.md` 的第一行（或明确标注的课题名称）提取。
+
+之后按深度优先遍历 section tree。对每个 section：
 
 1. 输出该 section 的 units（按 `units` 数组顺序）
 2. 递归输出 children（按 `children` 数组顺序）
@@ -142,6 +150,8 @@ S01
 ```
 
 ### 6.2 拼接方式与编号注入
+
+拼接时先写入一级标题 `# 申请书名称`（来源见 §6.1），再按 DFS 顺序拼接各 unit。
 
 每个 unit .md 文件的内容直接拼接。section 之间插入一个空行。unit 之间不额外插入分隔符（因为相邻 unit 的过渡已在写作时处理）。
 
@@ -300,9 +310,10 @@ HTML('/tmp/proposal_full.html').write_pdf('workflow/09_assemble/proposal_draft.p
 
 ### 第 2 步：按 section tree 组装
 
-1. 深度优先遍历 section tree
-2. 读取每个 unit 的 .md 文件内容
-3. 拼接为初始 draft
+1. 从 `outline_report.md`（或 `topic.md`）提取申请书名称，写入一级标题 `# 申请书名称`
+2. 深度优先遍历 section tree
+3. 读取每个 unit 的 .md 文件内容
+4. 拼接为初始 draft
 
 ### 第 2.5 步：注入标题编号（默认执行）
 

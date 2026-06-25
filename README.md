@@ -4,13 +4,18 @@
 
 ## 安装
 
-```bash
-# 安装插件
-claude plugins install <repo-url>
 
-# 或本地开发模式
-claude plugins link /path/to/grant-writing-plugin
+参考 [在 skills 目录中开发插件](https://code.claude.com/docs/zh-CN/plugins#develop-a-plugin-in-your-skills-directory)：
+
+```bash
+# 1. 初始化插件骨架
+claude plugin init grant-master
+
+# 2. 将本插件所有内容直接复制到初始化目录中
+cp -r grant-master/* ~/.claude/skills/grant-master/
 ```
+
+> **注意：** 运行 `claude plugin init` 后会在 `~/.claude/skills/` 下生成插件目录。本仓库所有文件（skills/、agents/、hooks/ 等）应直接复制到该目录中，覆盖初始化生成的骨架文件。
 
 系统依赖：
 
@@ -19,6 +24,12 @@ sudo apt install pandoc
 pip install weasyprint        # 可选，用于 PDF 输出
 pip install python-docx       # 可选，用于模板填充式 docx
 ```
+
+
+### 关于 `.plugins` 文件夹
+
+`.plugins` 文件夹（位于 `~/.claude/.plugins/`）存储的是从 Marketplace 下载的插件。`claude plugins install` 命令会自动将插件下载到该目录进行管理。由于我们是本地创建的，所以放到/.plugins文件夹是识别不到的。
+
 
 ## Pipeline
 
