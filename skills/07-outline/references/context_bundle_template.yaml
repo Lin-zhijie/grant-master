@@ -1,0 +1,28 @@
+# context_bundle.yaml —— 全局上下文束
+# 由 07-outline 在产出 writing_units 时一并生成
+# 所有 writer agent 启动时加载，确保在同一套事实上工作
+# 路径：workflow/07_outline/context_bundle.yaml
+
+writing_constraints:
+  tone: "客观严谨，用本项目而非我们"
+  person: "本项目"
+  tense:
+    background: "现在时/过去时"
+    proposal: "将来时"
+  paragraph_style: "多用短句和动宾结构，避免冗长从句"
+
+forbidden_expressions:
+  - "填补空白"
+  - "国内领先"
+  - "国际先进"
+  - "首次提出"
+  - "世界首次"
+  - "意义重大"
+
+terminology: []
+argument_chain:
+  summary: ""
+  steps: []
+forbidden_directions: []
+claim_allocations: []
+transition_map: {}

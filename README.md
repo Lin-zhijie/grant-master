@@ -15,7 +15,7 @@ claude plugin init grant-master
 cp -r grant-master/* ~/.claude/skills/grant-master/
 ```
 
-> **注意：** 运行 `claude plugin init` 后会在 `~/.claude/skills/` 下生成插件目录。本仓库所有文件（skills/、agents/、hooks/ 等）应直接复制到该目录中，覆盖初始化生成的骨架文件。
+> **注意：** 运行 `claude plugin init` 后会在 `~/.claude/skills/` 下生成插件目录。本仓库所有文件（skills/、agents/ 等）应直接复制到该目录中，覆盖初始化生成的骨架文件。
 
 系统依赖：
 

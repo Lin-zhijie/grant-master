@@ -57,7 +57,7 @@ topic.md
 
 ## 状态管理边界
 
-`./proposal_state.yaml` 只属于 `auto` 管理。本 Skill **绝不**读取、修改或创建该文件。
+`./workflow/proposal_state.yaml` 只属于 `auto` 管理。本 Skill **绝不**读取、修改或创建该文件。
 
 ---
 
@@ -81,7 +81,7 @@ topic.md
 4. 不直接生成技术路线、申请书大纲或申请书正文；
 5. 不把模型已有知识或初步搜索结果写成确定事实；
 6. 不把论文名称、系统名称、引用数、发表信息作为确定事实，除非明确来自用户提供材料；
-7. 不读取、修改或创建 `proposal_state.yaml`。
+7. 不读取、修改或创建 `./workflow/proposal_state.yaml`。
 
 ---
 
@@ -157,6 +157,26 @@ topic_result_template.yaml
 
 向用户简要说明：生成了哪些文件、课题初始理解质量、是否可以进入 `02-literature-plan`、如果需要补充则提出最多 3 个最关键问题。
 
+### 第 8 步：产出物完整性自检
+
+本阶段所有写入完成后，执行以下自检：
+
+1. 检查以下文件是否存在且非空（文件 size > 0）：
+   - `workflow/01_topic/01_topic_card.md`
+   - `workflow/01_topic/01_topic_result.yaml`
+   - `workflow/01_topic/01_literature_seed.yaml`
+2. 将验证结果写入 `01_topic_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 不声称阶段完成，在最终响应中说明缺失文件。
+
 ---
 
 ## 写作原则
@@ -205,7 +225,7 @@ topic_result_template.yaml
 
 1. 所有正文输出使用中文；
 2. 不硬编码项目绝对路径，默认使用当前工作目录；
-3. 不读取、不修改、不创建 `proposal_state.yaml`；
+3. 不读取、不修改、不创建 `./workflow/proposal_state.yaml`；
 4. 写每个输出文件前，用 Read 工具读取对应参考模板（按需读取，不要一次性全部加载）；
 5. 只生成 v0 初始理解，不生成成熟创新点，不生成最终文献空白判断；
 6. 不把已有调研报告直接综合成最终视角；

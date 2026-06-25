@@ -54,7 +54,7 @@ description: >
 
 ## 4. 状态管理边界
 
-`./proposal_state.yaml` 只属于 `auto` 管理。本 Skill 绝不读取、修改或创建该文件。
+`./workflow/proposal_state.yaml` 只属于 `auto` 管理。本 Skill 绝不读取、修改或创建该文件。
 
 ---
 
@@ -130,8 +130,8 @@ description: >
 ### 7.2 短期目标规则
 
 1. 背景调研任务可以单独作为一轮。
-2. 非背景轮次：1 个主任务 + 最多 1 个高度相关辅助任务。
-3. 不允许一轮覆盖多个松散方向。
+2. 非背景轮次：可以规划 1-3 个**互不依赖**的并行搜索任务。03-academic-search 支持并行 searcher agents，多条 query 可同时执行。
+3. 同一轮内的多个任务必须服务于同一个调研阶段目标（如同一轮回答"现有方法不足"的多个子问题），不允许把松散无关的任务塞进同一轮。
 4. 不允许把长期计划中的所有任务一次性交给 academic-search。
 5. 本轮 goal 必须能在一轮中执行，并产生可精读的候选论文集合。
 
@@ -204,7 +204,7 @@ description: >
 2. 每轮更新完成后，将 `long_plan.yaml` 完整复制为 `round_XX/long_plan.yaml`（快照）。
 3. 不删除历史任务，除非明确标记为 `dropped`。
 4. 每个任务必须有 `status` 字段。
-5. 每轮只选一个主任务，最多一个紧密相关辅助任务。
+5. 每轮可规划 1-3 个互不依赖的并行任务（03 支持并行 searcher agents）。
 6. 新增任务写入 `iterative_tasks` 或对应 plan 区域。
 7. 被跳过的任务写入 `completed_or_skipped_tasks`，`status` 标注 `skipped`，`reason` 记录跳过依据。
 8. 每轮更新后同步更新 `research_archive.yaml`。
@@ -223,7 +223,7 @@ description: >
 ## 13. `search_queries.yaml` 写入规则
 
 1. `round` 和路径中的 `round_XX` 必须与实际轮次一致。
-2. 非背景轮次的 `queries` 通常 3-6 条，只围绕一个主任务展开。
+2. 非背景轮次的 `queries` 通常 4-12 条（1-3 个并行任务 × 每个任务 3-4 条 query），queries 之间互不依赖以支持并行执行。
 3. 不把长期计划中的所有任务都写进 `queries`。
 4. `target_total_papers` 默认 10-15；背景轮可放宽到 20-30。
 
@@ -240,7 +240,7 @@ description: >
 7. 如果多个任务都重要，选依赖关系最靠前的任务；
 8. 用户明确指定方向时，以用户指定为准，但仍要控制范围。
 
-非背景轮次的本轮目标必须符合：**一个主问题 + 一组紧密相关的检索式 + 可形成 3-5 篇核心精读论文。**
+非背景轮次的本轮目标必须符合：**1-3 个互不依赖的并行问题 + 每组问题有 3-4 条检索式 + 可形成 10-15 篇核心精读论文（每任务 3-5 篇）。**
 
 ---
 
@@ -297,7 +297,7 @@ workflow/01_topic/01_literature_seed.yaml
 
 ### 16.3 计划过宽阻塞
 
-本轮无法收敛到一个主任务时，向用户提出最多 3 个选择问题。
+本轮任务之间互有依赖（无法并行）或方向过于松散（>3 个不相关方向）时，向用户提出最多 3 个选择问题。
 
 ---
 
@@ -337,10 +337,34 @@ workflow/01_topic/01_literature_seed.yaml
 
 1. 所有正文输出使用中文；查询式可以使用英文；
 2. 不硬编码绝对路径，默认使用当前工作目录；
-3. 不读取、修改、创建 `proposal_state.yaml`；
+3. 不读取、修改、创建 `./workflow/proposal_state.yaml`；
 4. 每轮更新顶层 `long_plan.yaml` 后，必须复制快照至 `round_XX/long_plan.yaml`；
 5. 生成计划时必须主动检查可跳过任务，有依据时在所有相关文件中标注；
-6. 非背景轮次必须聚焦一个主任务，最多一个紧密相关辅助任务；
+6. 非背景轮次可规划 1-3 个互不依赖的并行任务（03 支持并行搜索），但必须服务于同一调研阶段目标；
 7. 不执行 academic-search，不精读论文，不生成文献综述结论，不生成 gap 或创新点结论，不写申请书正文；
 8. 写输出文件前，用 Read 工具读取对应参考模板；
 9. 最终响应中不要执行其他 Skill。
+
+## 19. 产出物完整性自检
+
+本阶段所有文件写入完成后，执行以下自检：
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/02_literature_plan/long_plan.yaml`
+   - `workflow/02_literature_plan/research_archive.yaml`
+   - `workflow/02_literature_plan/round_XX/round_goal.md`
+   - `workflow/02_literature_plan/round_XX/search_queries.yaml`
+   - `workflow/02_literature_plan/round_XX/long_plan.yaml`
+   - `workflow/02_literature_plan/round_XX/plan_result.yaml`
+   - `workflow/02_literature_plan/latest_plan.yaml`
+2. 将验证结果写入 `plan_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 不声称阶段完成，在最终响应中说明缺失文件。

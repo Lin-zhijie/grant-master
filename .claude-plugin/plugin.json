@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "grant-master",
   "version": "0.1.0",
-  "description": "TODO: describe what this plugin provides",
+  "description": "中文项目申请书全流程自动撰写插件。提供从课题理解、文献调研规划、学术搜索、论文精读、综合分析、方案收敛、大纲与体量规划、逐单元正文写作、草稿组装、全局审阅到 docx 输出的完整工作流，并支持自动编排、断点续跑、质量门禁和审阅修复循环。",
   "skills": [
     "./"
   ]

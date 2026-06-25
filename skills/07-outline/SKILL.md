@@ -87,6 +87,7 @@ description: >
 │       ├── source_allocation.yaml
 │       ├── outline_state.yaml
 │       ├── outline_blueprint.yaml
+│       ├── context_bundle.yaml       # 全局上下文束——供所有 writer agent 使用
 │       └── outline_result.yaml
 ```
 
@@ -96,12 +97,12 @@ description: >
 
 ## 3. 状态管理边界
 
-`./proposal_state.yaml` 只属于 `auto` 管理。
+`./workflow/proposal_state.yaml` 只属于 `auto` 管理。
 
 本 Skill 绝不读取、修改或创建：
 
 ```text
-./proposal_state.yaml
+./workflow/proposal_state.yaml
 ```
 
 本 Skill 只通过 `workflow/07_outline/outline_result.yaml` 向 `auto` 汇报结果。
@@ -238,7 +239,7 @@ workflow/01_topic_card.md
 5. 不重新做 synthesis；
 6. 不重新做 helm 方案收敛；
 7. 不修改 06-helm 的任何输出；
-8. 不读取、修改或创建 `proposal_state.yaml`；
+8. 不读取、修改或创建 `./workflow/proposal_state.yaml`；
 9. 不将 helm decision_log 中标注为 `dropped` 的方向写入主线；
 10. 不直接使用 academic-search 候选论文作为申请书依据，除非该论文已进入 paper_digest 或 evidence_ledger；
 11. 不编造论文、数据、结论、项目基础或团队成果。
@@ -632,6 +633,7 @@ workflow/07_outline/
   source_allocation.yaml
   outline_state.yaml
   outline_blueprint.yaml
+  context_bundle.yaml          # 供 08 writer agents 使用
   outline_result.yaml
 ```
 
@@ -752,6 +754,24 @@ references/outline_result_template.yaml
 
 初始化所有 section 和 unit 状态。
 
+### 第 8.5 步：生成 context_bundle.yaml
+
+**这是 08-section-write 的 writer agents 的共享上下文**。不生成此文件将导致 writer agents 之间出现术语不一致、禁写内容穿透等问题。
+
+1. 读取模板 `references/context_bundle_template.yaml`
+2. 从以下来源填充各字段：
+
+| 字段 | 来源 |
+|------|------|
+| `writing_constraints` | 使用模板默认值（本项目/客观严谨），如有 CLAUDE.md 中的特殊规则则合并 |
+| `terminology` | 从 `scheme_blueprint.yaml` 的系统方案和 `current_view.md` 中提取核心术语（每个术语含 term/definition/aliases/forbidden） |
+| `argument_chain` | 从 `outline_report.md` 的论证链提取，每个 step 映射到对应 section_id |
+| `forbidden_directions` | 从 `decision_log.md` 中提取所有 dropped 和 background_only 方向，含 keyword_triggers |
+| `claim_allocations` | 从 `source_allocation.yaml` 中汇总每个 claim 分配到哪些 unit（含 usable_in/forbidden_in） |
+| `transition_map` | 从 `outline_state.yaml` 的 depends_on/feeds_into 生成，每个 unit 标注 feeds_into 和 transition_hint |
+
+3. 写入 `workflow/07_outline/context_bundle.yaml`
+
 ### 第 9 步：生成 outline_report 和 outline_blueprint
 
 `outline_report.md` 给人看，应包含：
@@ -779,6 +799,29 @@ references/outline_result_template.yaml
 ### 第 10 步：生成 outline_result
 
 写入阶段状态、输出路径、质量评分和下一阶段建议。
+
+### 第 11 步：产出物完整性自检
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/07_outline/outline_report.md`
+   - `workflow/07_outline/volume_budget.yaml`
+   - `workflow/07_outline/writing_units.yaml`
+   - `workflow/07_outline/source_allocation.yaml`
+   - `workflow/07_outline/outline_state.yaml`
+   - `workflow/07_outline/outline_blueprint.yaml`
+   - `workflow/07_outline/context_bundle.yaml`
+   - `workflow/07_outline/outline_result.yaml`
+2. 将验证结果写入 `outline_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 不声称阶段完成，阻塞 08-section-write 的启动。
 
 ---
 
@@ -841,7 +884,7 @@ blocked units：[X 个]
 1. 所有正文输出使用中文；
 2. 可保留必要英文术语；
 3. 不硬编码项目绝对路径；
-4. 不读取、修改、创建 `proposal_state.yaml`；
+4. 不读取、修改、创建 `./workflow/proposal_state.yaml`；
 5. 不写申请书正文；
 6. 不重新做 helm；
 7. 不重新做 synthesis；

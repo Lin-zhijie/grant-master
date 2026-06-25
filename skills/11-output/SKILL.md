@@ -54,7 +54,7 @@ description: >
 ## 3. 状态管理边界
 
 - 本 Skill 是链条终点，只输出、不修改上游任何文件。
-- `./proposal_state.yaml`：绝不读取、修改或创建。
+- `./workflow/proposal_state.yaml`：绝不读取、修改或创建。
 
 ---
 
@@ -90,7 +90,25 @@ workflow/10_review/review_result.yaml     # 确认审阅已通过（P0=0）
 
 1. 不修改 proposal_draft.md 的内容；
 2. 不重新执行审阅；
-3. 如果 review_result.yaml 显示有 P0 未解决，应警告但不阻塞。
+3. 如果 review_result.yaml 显示有 P0 未解决，**硬阻塞**，不得输出 docx。
+
+## 5.1 审阅门禁（硬阻塞）
+
+以下条件**任一不满足 → 停止执行，不生成 docx**：
+
+1. `workflow/10_review/review_result.yaml` **必须存在**
+2. review_result.yaml 中 `P0_count == 0`
+3. review_result.yaml 中 `ready_for_output == true`（若该字段不存在则检查 `approved == true`）
+
+若阻塞，输出：
+
+```
+11-output 阻塞：10-review 未通过
+原因：{review_result.yaml 缺失 / 存在 X 个 P0 问题未解决}
+请先执行 10-review 并解决所有 P0 问题。
+```
+
+上下文压力、token 压力、时间压力——均不得作为跳过此门禁的理由。详见 `workflow_contract.md`。
 
 ---
 
@@ -224,11 +242,15 @@ pandoc workflow/09_assemble/proposal_draft.md \
 2. 确认 Template.docx 存在且可读
 3. 检查 pandoc 可用
 
-### 第 2 步：审阅状态确认
+### 第 2 步：审阅门禁检查（硬阻塞）
 
-读取 review_result.yaml：
-- `P0_count == 0` → 继续
-- `P0_count > 0` → 警告用户存在未解决的 P0 问题，询问是否继续
+1. 检查 `workflow/10_review/review_result.yaml` 是否存在
+2. 若不存在 → **硬阻塞**，终止执行，输出："11-output 阻塞：未找到 10_review/review_result.yaml，请先完成 10-review"
+3. 若存在，读取并检查：
+   - `P0_count == 0` → 继续
+   - `P0_count > 0` → **硬阻塞**，终止执行，输出 P0 问题数量和位置
+   - `ready_for_output != true` → **硬阻塞**，终止执行
+4. 阻塞不可以通过"询问用户是否继续"绕过——10-review 是 11-output 的强制前置阶段
 
 ### 第 3 步：执行预处理
 
@@ -243,6 +265,23 @@ pandoc workflow/09_assemble/proposal_draft.md \
 执行 §6.4 的验证，生成报告。
 
 ### 第 6 步：写 output_result.yaml
+
+### 第 7 步：产出物完整性自检
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/11_output/proposal.docx`
+   - `workflow/11_output/output_result.yaml`
+2. 将验证结果写入 `output_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 不声称阶段完成。
 
 ---
 
@@ -285,5 +324,5 @@ workflow/11_output/
 1. 不修改 proposal_draft.md 的内容；
 2. 必须使用 Template.docx 作为 reference-doc；
 3. pandoc 不可用时给出清晰的安装指引，不阻塞；
-4. P0 未解决时警告但不阻塞；
+4. P0 未解决时**硬阻塞**，不得输出 docx；
 5. 最终响应中不要执行其他 Skill。

@@ -64,7 +64,7 @@ workflow/
 
 ## 3. 状态管理边界
 
-- `./proposal_state.yaml` 只属于 `auto` 管理。本 Skill **绝不**读取、修改或创建该文件。
+- `./workflow/proposal_state.yaml` 只属于 `auto` 管理。本 Skill **绝不**读取、修改或创建该文件。
 - `./workflow/07_outline/outline_state.yaml`：只读——读取 section tree 和 unit 状态。
 - `./workflow/08_section_write/units/`：只读——读取所有 unit .md 文件。
 - 本 Skill 写入 `workflow/09_assemble/` 下的所有文件。
@@ -78,6 +78,7 @@ workflow/
 ```text
 workflow/07_outline/outline_state.yaml       # section tree + unit 列表 + 状态
 workflow/07_outline/outline_report.md        # §10 跨节一致性约束、关键术语表
+workflow/07_outline/context_bundle.yaml      # 术语表、禁写列表、claim 分配表（用于跨 unit 一致性检查）
 workflow/08_section_write/units/*.md         # 所有 unit 正文
 ```
 
@@ -290,11 +291,26 @@ HTML('/tmp/proposal_full.html').write_pdf('workflow/09_assemble/proposal_draft.p
 - heading-only 的 section 是否正确只输出了一行标题
 - 若使用了 `--no-numbers`：确认标题不含编号（干净模式）
 
-### 7.3 字数统计
+### 7.3 跨 Unit 连贯性扫描
+
+由于 writer agents 并行写不同 section 的 unit，组装后需要额外检查跨 unit 衔接质量：
+
+| 检查项 | 方法 | 严重程度 |
+|---|---|---|
+| 相邻 unit 之间是否有过渡句 | 检查每个 unit 的最后 1-2 句和下一个 unit 的开头 1-2 句是否形成了自然的承上启下 | warning（>=1 处无过渡扣 P2） |
+| 术语是否与 context_bundle 一致 | 从 context_bundle.yaml 提取术语表，在 draft 中搜索每个术语的每次出现——检查是否有 forbidden 变体、同一概念用了不同词 | warning（>=1 处不一致扣 P1） |
+| forbidden_expressions 是否出现 | 全文搜索 context_bundle 中列的禁写词（"填补空白""国内领先"等） | error（出现即 P0） |
+| forbidden_directions 关键词是否出现 | 全文搜索 context_bundle 中列的 dropped 方向关键词 | error（出现即 P0） |
+| 同一 claim 在不同 unit 中表述是否一致 | 从 context_bundle 的 claim_allocations 中提取跨 unit 的 claim，对比各 unit 中该 claim 的表述 | warning（偏差 > 30% 语义相似度扣 P1） |
+| 论证链各步骤是否都有对应正文 | 从 context_bundle.argument_chain 提取步骤，在 draft 中搜索对应的 section，检查是否有空壳（只有标题无实质内容） | error（缺失扣 P0） |
+
+此检查在 09-assemble 执行——因为只有全部 unit 组装后才能看到跨 unit 的连贯性。检查结果写入 `assemble_report.md`。
+
+### 7.4 字数统计
 
 按 section 统计实际字数，与 `volume_budget.yaml` 的目标对比，标记偏差 > 20% 的章节。
 
-### 7.4 术语一致性扫描
+### 7.5 术语一致性扫描
 
 从 `outline_report.md` §10 提取关键术语表，在 draft 中搜索每个术语的首次出现位置和后续使用是否一致。
 
@@ -334,6 +350,24 @@ HTML('/tmp/proposal_full.html').write_pdf('workflow/09_assemble/proposal_draft.p
 若 weasyprint 不可用，输出警告，跳过此步骤，不阻塞。
 
 ### 第 5 步：写 assemble_result.yaml
+
+### 第 6 步：产出物完整性自检
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/09_assemble/proposal_draft.md`
+   - `workflow/09_assemble/assemble_report.md`
+   - `workflow/09_assemble/assemble_result.yaml`
+2. 将验证结果写入 `assemble_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 不声称阶段完成。
 
 ---
 

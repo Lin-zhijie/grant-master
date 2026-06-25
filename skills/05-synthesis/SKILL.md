@@ -287,7 +287,7 @@ helm 和 outline 不应该从 03、04 的大量原始文件中捞信息。它们
 
 **5. 多轮验证**
 - **第一轮 synthesis 不允许建议进入 helm**（除非用户明确要求，或 long_plan 中所有核心任务在本轮前已被标注为 completed）
-- 至少经过 2 轮调研循环（01→02→03→04→05 至少运行 2 次），且第二轮的新增认知相比第一轮确实减少了
+- 至少经过 3 轮调研循环（02→03→04→05 至少运行 2 次），且第3轮的新增认知相比第1、2轮确实减少了
 
 **6. 边际收益递减确认**
 - 最近一轮 synthesis 的核心发现中，不存在"改变了主线判断"的重大新认知
@@ -365,7 +365,7 @@ current_view.md 主要变化：
 
 1. 所有正文使用中文；
 2. 不硬编码绝对路径；
-3. 不读取、修改、创建 `proposal_state.yaml`；
+3. 不读取、修改、创建 `./workflow/proposal_state.yaml`；
 4. 每轮只读新材料 + 已有 current_view，不重读历史轮次报告；
 5. `current_view.md` 是自包含的领域说明书，可以独立阅读，不依赖轮次报告；
 6. `synthesis_report.md` 是深度分析文档，每条发现必须包含"证据→分析→对课题的影响"完整推理链——禁止写成要点罗列或变更日志；
@@ -374,3 +374,26 @@ current_view.md 主要变化：
 9. 跳过建议必须有本轮证据依据，核心任务不能仅凭推断跳过；
 10. 写输出文件前读对应参考模板，按需加载；
 11. 最终响应中不要执行其他 Skill。
+
+## 11. 产出物完整性自检
+
+本阶段所有文件写入完成后，执行以下自检：
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/05_synthesis/current_view.md`
+   - `workflow/05_synthesis/evidence_ledger.yaml`
+   - `workflow/05_synthesis/round_XX/synthesis_report.md`
+   - `workflow/05_synthesis/round_XX/synthesis_result.yaml`
+   - `workflow/05_synthesis/latest_result.yaml`
+2. 将验证结果写入 `latest_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. `synthesis_result.yaml` 中亦须包含 `integrity` 字段。
+4. 若 `all_outputs_present: false` → 不声称阶段完成，`rounds_completed` 不递增。

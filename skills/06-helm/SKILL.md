@@ -44,7 +44,7 @@ description: >
 
 ## 3. 状态管理边界
 
-`./proposal_state.yaml` 只属于 `auto` 管理。本 Skill 不读取、不修改、不创建该文件。
+`./workflow/proposal_state.yaml` 只属于 `auto` 管理。本 Skill 不读取、不修改、不创建该文件。
 
 ---
 
@@ -179,6 +179,25 @@ workflow/01_topic/01_topic_card.md
 
 写所有 4 个输出文件（格式见 §7），每个文件写前先用 Read 工具读取对应参考模板。
 
+### 第 9 步：产出物完整性自检
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/06_helm/helm_report.md`
+   - `workflow/06_helm/scheme_blueprint.yaml`
+   - `workflow/06_helm/decision_log.md`
+   - `workflow/06_helm/helm_result.yaml`
+2. 将验证结果写入 `helm_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 设置 `can_continue: false`，不声称阶段完成。缺失 scheme_blueprint.yaml 时必须阻塞——07-outline 依赖此文件。
+
 ---
 
 ## 7. 输出文件结构
@@ -256,7 +275,7 @@ workflow/06_helm/
 
 1. 所有正文输出使用中文；
 2. 不硬编码项目绝对路径，默认使用当前工作目录；
-3. 不读取、不修改、不创建 `proposal_state.yaml`；
+3. 不读取、不修改、不创建 `./workflow/proposal_state.yaml`；
 4. 写输出文件前用 Read 工具读取对应参考模板，按需读取；
 5. 严格遵守 §5 核心约束，不生成多路线、多核心问题的发散方案；
 6. 必须明确不做什么，以及为什么不做；

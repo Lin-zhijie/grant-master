@@ -2,12 +2,13 @@
 name: 04-paper-digest
 description: >
   中文项目申请书写作流程第 04 阶段工具：论文精读。
-  逐篇精读 papers/inbox/ 中的论文 PDF，生成结构化精读报告，读完一篇立即将其移至 papers/proceeded/，全部读完后输出本轮综合精读报告供 05-synthesis 使用。
+  作为 coordinator，扫描 papers/inbox/ 中的论文 PDF，将每篇论文分发给 grant-digester worker agent 并行精读，
+  收集精读报告后统一将 PDF 移至 papers/proceeded/，全部完成后输出本轮综合精读报告供 05-synthesis 使用。
 
   当用户输入 /grant-master:04-paper-digest，或在 grant 工作流中需要精读本轮候选论文时，使用本 Skill。
 
   本 Skill 是 03-academic-search 的下游、05-synthesis 的上游。
-  它只负责逐篇精读和结构化摘要，不综合论文结论、不判断最终 gap、不生成创新点、不写申请书正文。
+  它只负责编排精读流程和生成综合报告，单篇精读由 grant-digester agent 执行，不综合论文结论、不判断最终 gap、不生成创新点、不写申请书正文。
 ---
 
 # 04-paper-digest：论文精读
@@ -21,16 +22,19 @@ description: >
 ```text
 03_academic_search（search_results.yaml）+ papers/inbox/（PDF）
   ↓
-04_paper_digest（本 Skill）
+04_paper_digest（本 Skill / Coordinator）
   ├── 读取背景：本轮目标、长期计划
-  ├── 逐篇精读 inbox 中的 PDF，生成单篇精读报告
-  ├── 每篇读完后立即移入 papers/proceeded/
-  └── 全部读完后生成综合精读报告
+  ├── 扫描 inbox，构建精读任务列表
+  ├── 逐篇 dispatch 给 grant-digester worker agent（可并行）
+  ├── 等待所有 digester 返回精读报告
+  ├── 验证报告完整性后，将 PDF 移至 papers/proceeded/
+  ├── 更新 paper_index.yaml
+  └── 全部完成后生成综合精读报告 digest_report.md
   ↓
 05_synthesis
 ```
 
-本 Skill 不执行检索，不综合论文结论，不判断最终 gap，不生成创新点，不写申请书正文。
+本 Skill 不执行单篇精读——精读由 grant-digester worker agent 执行。本 Skill 只负责编排、PDF 移动和综合报告。
 
 ---
 
@@ -88,18 +92,34 @@ papers/inbox 中也会有手动下载的 PDF，其中一些可能是在 `search_
 
 若 inbox 为空，生成 blocked 版 `digest_result.yaml`，报告阻塞。
 
-### 第 3 步：逐篇精读
+### 第 3 步：构建精读任务并 dispatch 给 digester agents
 
-对 inbox 中每篇论文，依次执行：
+对 inbox 中每篇论文，构建 digester 输入（见 `agents/digester.md` §4 输入格式）：
 
-1. 用 Read 工具读取 PDF；
-2. 按 §4 单篇精读结构生成报告，写入 `workflow/04_paper_digest/round_XX/papers/{filename_no_ext}.md`；
-3. 立即执行 `mv papers/inbox/{file}.pdf papers/proceeded/{file}.pdf`（读完即移，不批处理）；
-4. 在 `workflow/04_paper_digest/paper_index.yaml` 中追加本篇记录。
+1. 从 `search_results.yaml` 提取该论文的元数据字段 → `paper_metadata`
+2. 从 `round_goal.md` 提取核心问题与目标片段 → `round_goal_excerpt`
+3. 从 `long_plan.yaml` 提取待验证假设 → `hypothesis_to_verify`
+4. 组合为单篇精读任务，dispatch 给 `grant-digester` worker agent
 
-**精读顺序**：`digest_priority: high` → `medium` → `low`；同优先级内 `relevance: core` 优先。
+**dispatch 顺序**：`digest_priority: high` → `medium` → `low`；同优先级内 `relevance: core` 优先。
 
-**精读深度**：`core` 论文精读全部 7 节；`general` 论文可适当压缩，但 §4（与课题相关性）和 §6（局限与 gap）必须完整。
+**并行策略**：digester agents 之间无依赖，可全部并行 dispatch。`grant-digester` 标记为 `parallel_safe: true`，coordinator 应同时启动所有精读任务以最大化吞吐。
+
+**精读深度**（在构造任务时通过 `paper_metadata.relevance` 传达）：`core` 论文 → digester 精读全部 7 节；`general` 论文 → digester 可适当压缩 §1-3、§5，但 §4 和 §6 必须完整。
+
+### 第 3.5 步：收集 digester 结果并验证
+
+每个 digester 返回后，coordinator 验证：
+
+1. 精读报告文件 `workflow/04_paper_digest/round_XX/papers/{filename_no_ext}.md` 是否已写入且非空
+2. 返回的结构化摘要（见 `agents/digester.md` §7）是否完整
+
+验证通过后：
+1. 执行 `mv papers/inbox/{filename}.pdf papers/proceeded/{filename}.pdf`（coordinator 执行，digester 不碰文件）
+2. 在 `workflow/04_paper_digest/paper_index.yaml` 中追加本篇记录（使用 digester 返回的 `paper` 和 `digest_summary` 字段）
+3. 标记该篇 `status: digested`
+
+若某 digester 报告验证失败或缺漏，标记该篇 `status: unreadable`，PDF 不移动，继续处理其余。
 
 ### 第 4 步：生成综合精读报告
 
@@ -109,13 +129,33 @@ papers/inbox 中也会有手动下载的 PDF，其中一些可能是在 `search_
 
 写入 `workflow/04_paper_digest/round_XX/digest_result.yaml`，更新 `workflow/04_paper_digest/paper_index.yaml`。
 
+### 第 6 步：产出物完整性自检
+
+1. 检查以下文件是否存在且非空：
+   - `workflow/04_paper_digest/round_XX/digest_report.md`
+   - `workflow/04_paper_digest/round_XX/digest_result.yaml`
+   - `workflow/04_paper_digest/paper_index.yaml`
+2. 将验证结果写入 `digest_result.yaml` 的 `integrity` 字段：
+
+```yaml
+integrity:
+  all_outputs_present: true/false
+  checked_at: "<当前时间>"
+  missing_outputs: []
+  warnings: []
+```
+
+3. 若 `all_outputs_present: false` → 不声称阶段完成，在最终响应中说明缺失文件。
+
 ---
 
 ## 4. 单篇精读结构
 
+> **权威定义**：7 节结构、精读深度规则和输出格式的权威定义在 `agents/digester.md` §6-§7。本节保留副本供 coordinator 参考，但执行精读的 digester agent 以自己的 agent 定义为准。
+
 路径：`workflow/04_paper_digest/round_XX/papers/{filename_no_ext}.md`
 
-严格使用以下 7 节结构：
+严格使用以下 7 节结构（与 `agents/digester.md` §6 一致）：
 
 ```markdown
 # 精读报告：[论文标题]
@@ -300,7 +340,9 @@ notes:
 
 ## 6. 论文移动规则
 
-精读每篇论文后**立即**执行（不批处理）：
+**digester agent 不移动 PDF**。移动由 coordinator（本 Skill）在验证 digester 返回的精读报告后执行。
+
+对每篇验证通过的论文，coordinator 执行：
 
 ```bash
 mv papers/inbox/{filename}.pdf papers/proceeded/{filename}.pdf
@@ -308,6 +350,7 @@ mv papers/inbox/{filename}.pdf papers/proceeded/{filename}.pdf
 
 - 若 `papers/proceeded/` 不存在，先创建：`mkdir -p papers/proceeded`；
 - 移动后在 `paper_index.yaml` 中记录 `proceeded_path`；
+- 若某篇验证未通过（`status: unreadable`），PDF **保留在 inbox**，不移动；
 - 若 `mv` 失败（文件不存在或权限问题），标注跳过原因，继续处理下一篇。
 
 ---
@@ -347,9 +390,9 @@ mv papers/inbox/{filename}.pdf papers/proceeded/{filename}.pdf
 
 1. 所有正文输出使用中文；
 2. 不硬编码绝对路径，所有路径相对当前工作目录；
-3. 不读取、修改、创建 `proposal_state.yaml`；
+3. 不读取、修改、创建 `./workflow/proposal_state.yaml`；
 4. 精读以 `round_goal.md` 中的核心问题为导向，不泛读；
-5. 每篇读完立即移动 PDF，不批处理；
+5. coordinator 在 digester 返回且验证通过后移动 PDF，digester 不碰文件；
 6. 单篇精读严格使用 7 节结构；
 7. `paper_index.yaml` 跨轮次持续追加，不覆盖历史记录；
 8. 不执行文献检索，不生成新的搜索任务；
