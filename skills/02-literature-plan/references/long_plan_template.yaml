@@ -1,0 +1,81 @@
+stage: "LITERATURE_PLAN"
+version: "v1"
+updated_after_round: 1
+
+project_research_objective: ""
+
+background_plan:
+  needed: false
+  status: "skipped"        # pending / in_progress / completed / skipped
+  reason: ""
+  tasks:
+    - id: "B1"
+      name: ""
+      goal: ""
+      priority: "medium"
+      status: "pending"
+      evidence_needed:
+        - ""
+      notes: ""
+
+core_research_plan:
+  tasks:
+    - id: "C1"
+      name: ""
+      goal: ""
+      priority: "high"
+      status: "pending"    # pending / planned / searched / digested / synthesized / dropped
+      dependencies: []
+      evidence_needed:
+        - ""
+      related_rounds: []
+      notes: ""
+
+technical_research_plan:
+  tasks:
+    - id: "T1"
+      name: ""
+      technology_area: ""
+      goal: ""
+      priority: "high"
+      status: "pending"
+      dependencies: []
+      evidence_needed:
+        - ""
+      related_rounds: []
+      notes: ""
+
+iterative_tasks:
+  - id: "I1"
+    source_round: 1
+    source_file: ""
+    name: ""
+    goal: ""
+    priority: "medium"
+    status: "pending"
+    reason_added: ""
+    evidence_needed:
+      - ""
+
+completed_or_skipped_tasks:
+  - id: ""
+    name: ""
+    status: "completed"    # completed / skipped
+    reason: ""             # 跳过依据：来自哪个文件或用户何时指出
+    related_rounds:
+      - 1
+
+current_priority_queue:
+  - task_id: ""
+    reason: ""
+
+round_history:
+  - round: 1
+    short_goal: ""
+    task_ids:
+      - ""
+    expected_academic_search_dir: "workflow/03_academic_search/round_01"
+    status: "planned"
+
+notes:
+  - "长期计划是路线图，不是本轮 academic-search 任务。"

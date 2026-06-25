@@ -1,0 +1,71 @@
+stage: "OUTLINE"
+version: "v2"
+
+purpose: "为每个 writing unit 分配上游材料、证据、论文来源和禁写内容。"
+
+source_layers:
+  L1_primary:
+    - "workflow/06_helm/scheme_blueprint.yaml"
+    - "workflow/06_helm/helm_report.md"
+    - "topic.md"
+  L2_evidence_index:
+    - "workflow/05_synthesis/current_view.md"
+    - "workflow/05_synthesis/evidence_ledger.yaml"
+    - "workflow/04_paper_digest/paper_index.yaml"
+  L3_traceback:
+    - "workflow/04_paper_digest/round_XX/papers/*.md"
+    - "workflow/04_paper_digest/round_XX/digest_report.md"
+    - "workflow/05_synthesis/round_XX/synthesis_report.md"
+
+# ============================================================
+# units：每个 unit 的 section_id 指向大纲叶结点
+# unit_id 格式：{叶结点ID}-U{NNN}
+# ============================================================
+units:
+  - unit_id: "S01.1-U001"
+    section_id: "S01.1"            # 大纲叶结点 ID
+    section_heading: ""            # 叶结点标题
+    heading_level: 2               # 输出标题级别
+    title: ""                      # unit 标题
+    status: "ready"                # ready / partial / blocked
+    blocked_reason: ""
+    source_pack_needed: true
+    primary_sources:
+      - path: "workflow/06_helm/scheme_blueprint.yaml"
+        usage: ""
+    synthesis_sources:
+      - path: "workflow/05_synthesis/current_view.md"
+        anchor: ""
+        usage: ""
+    evidence_claims:
+      - claim_id: ""
+        claim: ""
+        evidence_level: "medium"        # strong / medium / weak / unknown
+        usage: ""
+        usable_for_application_text: false
+    paper_sources:
+      - paper_id: ""
+        title: ""
+        report_path: ""
+        usage: ""
+    data_points:
+      - ""
+    figures_or_tables:
+      - type: ""
+        description: ""
+        source: ""
+    must_use:
+      - ""
+    optional_use:
+      - ""
+    avoid:
+      - ""
+    caveats:
+      - ""
+
+metadata:
+  total_units: 0
+  ready_units: 0
+  partial_units: 0
+  blocked_units: 0
+  units_requiring_l3_traceback: 0

@@ -1,0 +1,53 @@
+stage: "OUTPUT"
+status: "completed"
+can_continue: false                    # 链条终点
+recommended_next_stage: ""
+
+prerequisites:
+  pandoc_available: true
+  template_exists: true
+  review_passed: true                  # P0_count == 0
+
+conversion:
+  source_file: "workflow/09_assemble/proposal_draft.md"
+  template_file: "references/Template.docx"
+  output_file: "workflow/11_output/proposal.docx"
+  pandoc_command: ""
+  exit_code: 0
+
+verification:
+  file_size_bytes: 0
+  estimated_pages: 0
+  target_pages: 0
+  page_deviation_pct: 0.0
+  checks:
+    - check: "文件可打开"
+      status: "pass"
+    - check: "样式继承"
+      status: "pass"
+    - check: "中文编码"
+      status: "needs_manual_check"
+      note: "请在 Word 中打开确认中文未乱码"
+    - check: "图表占位"
+      status: "needs_manual_check"
+      note: "请替换图片占位为实际图表"
+
+user_actions:
+  - "在 Word 中打开 proposal.docx，确认中文未乱码"
+  - "替换图表占位为实际图片"
+  - "检查页数是否在申报要求范围内"
+  - "如需修改内容：回灌到对应 unit → 重新 08-section-write → 09 → 10 → 11"
+
+warnings: []
+notes:
+  - "这是 grant skill 链条的终点。"
+
+# ============================================================
+# 阻塞时
+# ============================================================
+# status: "blocked"
+# can_continue: false
+# intervention:
+#   required: true
+#   reason: ""
+#   questions: []

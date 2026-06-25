@@ -1,0 +1,91 @@
+# ============================================================
+# 成功完成时使用以下格式
+# ============================================================
+stage: "LITERATURE_PLAN"
+round: 1
+status: "completed"
+can_continue: true
+recommended_next_stage: "ACADEMIC_SEARCH"
+
+basis:
+  - ""
+
+outputs:
+  long_plan: "workflow/02_literature_plan/long_plan.yaml"
+  long_plan_snapshot: "workflow/02_literature_plan/round_01/long_plan.yaml"
+  round_goal: "workflow/02_literature_plan/round_01/round_goal.md"
+  search_queries: "workflow/02_literature_plan/round_01/search_queries.yaml"
+  research_archive: "workflow/02_literature_plan/research_archive.yaml"
+
+next_expected_outputs:
+  academic_search_dir: "workflow/03_academic_search/round_01"
+  files:
+    - "search_results.yaml"
+    - "candidate_papers.md"
+    - "download_queue.yaml"
+    - "search_summary.md"
+
+selected_tasks:
+  main_task_id: ""
+  auxiliary_task_ids: []
+
+skipped_tasks_this_round: []   # 本轮标注为 skipped 的任务 ID 列表
+
+quality:
+  long_plan_completeness: 0.0
+  goal_focus: 0.0
+  query_specificity: 0.0
+  scope_control: 0.0
+  academic_search_readiness: 0.0
+
+intervention:
+  required: false
+  reason: ""
+  questions: []
+
+notes:
+  - ""
+
+# ============================================================
+# 阻塞时使用以下格式
+# ============================================================
+# stage: "LITERATURE_PLAN"
+# round: 1
+# status: "blocked"
+# can_continue: false
+# recommended_next_stage: ""
+#
+# basis: []
+#
+# outputs:
+#   long_plan: ""
+#   long_plan_snapshot: ""
+#   round_goal: ""
+#   search_queries: ""
+#   research_archive: ""
+#
+# next_expected_outputs:
+#   academic_search_dir: ""
+#   files: []
+#
+# selected_tasks:
+#   main_task_id: ""
+#   auxiliary_task_ids: []
+#
+# skipped_tasks_this_round: []
+#
+# quality:
+#   long_plan_completeness: 0.0
+#   goal_focus: 0.0
+#   query_specificity: 0.0
+#   scope_control: 0.0
+#   academic_search_readiness: 0.0
+#
+# intervention:
+#   required: true
+#   reason: "缺少生成本轮文献查找计划所需的输入文件。"
+#   questions:
+#     - "请先完成 grant-topic，生成 workflow/01_topic/01_literature_seed.yaml。"
+#
+# notes:
+#   - ""

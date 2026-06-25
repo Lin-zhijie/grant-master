@@ -1,0 +1,211 @@
+---
+name: auto
+description: >
+  Grant 申请书写作全流程自动化编排器。
+  管理 proposal_state.yaml 全局状态，读取各阶段 result 文件，
+  自动研判需要执行哪个阶段，处理调研循环（02-05）、写作循环（08）和审阅修复循环（10→08），
+  支持协作模式和自动模式，支持断点续跑。
+
+  当用户输入 /grant-master:auto，或在任何 grant 工作流中需要自动推进流程时，使用本 Skill。
+  本 Skill 不执行具体工作——它只读取状态、研判路由、调用下游 Skill、更新状态。
+---
+
+# auto：全流程自动化编排器
+
+## 1. 定位
+
+auto 是 grant skill 链条的**自动驾驶仪**。它不做具体工作（不调研、不写作、不审阅），只做三件事：
+
+```text
+1. 读状态 → proposal_state.yaml + 各阶段 result 文件
+2. 判路由 → 下一步该执行哪个阶段
+3. 调 Skill → 调用对应的 XX-name skill，然后更新状态
+```
+
+## 2. 状态文件
+
+auto **独享** `./proposal_state.yaml` 的读写权限。其他 XX-name skill **绝不**读取或修改此文件。
+
+初始时若 `./proposal_state.yaml` 不存在，按 `references/proposal_state_template.yaml` 创建。
+
+同时读取各阶段的 result 文件来更新状态（见 §4）。
+
+## 3. Pipeline 拓扑
+
+```text
+01_topic
+  ↓
+02_literature_plan → 03_academic_search → 04_paper_digest → 05_synthesis
+  ↑                                                              │
+  └──────────── 调研循环（02-05 可回环）──────────────────────────┘
+                                                                  ↓
+                                                            06_helm
+                                                                  ↓
+                                                            07_outline
+                                                                  ↓
+                                                            08_section_write ←─────────┐
+                                                              (逐 unit 循环)            │
+                                                                  ↓                     │
+                                                            09_assemble                │
+                                                                  ↓                     │
+                                                            10_review ─── P0>0 ────────┘
+                                                                  ↓
+                                                            11_output
+```
+
+每个阶段的输入/输出和职责见对应 Skill 的 SKILL.md。
+
+## 4. 阶段 Result 文件映射
+
+每个阶段完成后，auto 读取其 result 文件来更新 `proposal_state.yaml`：
+
+| 阶段 | Result 文件 | 提取的关键信息 |
+|---|---|---|
+| 01 | `workflow/01_topic_card.md` | 文件存在即完成 |
+| 02 | `workflow/02_literature_plan/latest_result.yaml` | 本轮搜索目标数 |
+| 03 | `workflow/03_academic_search/round_XX/search_summary.md` | 候选论文数、已下载数 |
+| 04 | `workflow/04_paper_digest/round_XX/digest_report.md` | 本轮精读论文数 |
+| 05 | `workflow/05_synthesis/latest_result.yaml` | 是否建议继续调研、strong claims 数、convergence |
+| 06 | `workflow/06_helm/helm_result.yaml` | can_continue、方案状态 |
+| 07 | `workflow/07_outline/outline_result.yaml` | total_units、blocked_units、quality scores |
+| 08 | `workflow/08_section_write/unit_result.yaml` | 刚写完的 unit、剩余 pending 数、all_complete |
+| 09 | `workflow/09_assemble/assemble_result.yaml` | 组装质量、heading 编号修复数 |
+| 10 | `workflow/10_review/review_result.yaml` | P0/P1/P2 计数、ready_for_output |
+| 11 | `workflow/11_output/output_result.yaml` | 输出文件路径 |
+
+## 5. 路由逻辑
+
+### 5.1 线性推进
+
+```text
+当前 stage=N → 执行 grant-0N → 读 result → 标记 completed → stage=N+1 → 执行...
+```
+
+自动跳过已 `completed` 的阶段，从中断处继续（断点续跑）。
+
+### 5.2 循环控制
+
+**调研循环（02-05）**：
+
+每次 05 完成后，读 `latest_result.yaml`：
+- 若 `recommend_continue_research: true` 且 `rounds_completed < max_rounds`：
+  - 协作模式：告知用户本轮结论，询问"继续调研还是进入方案？"
+  - 自动模式：检查 exit_criteria（strong_claims ≥ 3、papers ≥ 10、convergence），满足则进 06，否则继续 02
+- 否则 → 进 06
+
+**写作循环（08）**：
+
+每次 08 完成后，读 `unit_result.yaml`：
+- 若 `all_complete: false` → 继续调用 08-section-write（写下一个 pending unit）
+- 若 `all_complete: true` → 进 09
+
+**审阅修复循环（10→08→09→10）**：
+
+每次 10 完成后，读 `review_result.yaml`：
+- 若 `P0_count > 0` 且 `review_loop.iterations < max_iterations`：
+  - 协作模式：列出 P0 建议，询问"修复后继续还是手动处理？"
+  - 自动模式：标记对应 unit 为 pending（通过 outline_state.yaml），重新 08→09→10
+- 若 `P0_count == 0` → 进 11
+
+### 5.3 阻塞处理
+
+任何阶段返回 `status: blocked` 或 `can_continue: false` → 停止，记录阻塞原因。
+
+## 6. 用户指令研判
+
+auto 接收的第一个用户消息，按以下优先级研判意图：
+
+| 用户指令 | 研判 | 行为 |
+|---|---|---|
+| 无参数或"继续"/"下一步" | 从中断处继续 | 读 proposal_state.yaml → 找下一个 pending stage → 执行 |
+| "从头开始" | 重置 pipeline | 确认后清空状态，从 01 开始 |
+| "状态"/"进度" | 查看进度 | 读 proposal_state.yaml，展示 pipeline 状态、完成度 |
+| "继续调研"/"再来一轮" | 调研循环 | 设置 02 为 pending，执行 02→03→04→05 |
+| "进入方案"/"生成大纲" | 跳过剩余调研 | 若 05 completed 则进 06，否则提示 |
+| "审阅" | 审阅修复循环 | 若 08 all_complete 则进 09→10 |
+| "输出"/"导出" | 最终输出 | 若 10 通过则进 11 |
+| "修复 P0" | 审阅修复循环 | 按 10 建议回灌 unit，进 08→09→10 |
+| "自动模式" | 切换模式 | 设置 mode=autonomous |
+| "协作模式" | 切换模式 | 设置 mode=collaborative |
+
+## 7. 执行流程
+
+### 第 1 步：初始化状态
+
+1. 若 `./proposal_state.yaml` 不存在 → 从 `references/proposal_state_template.yaml` 创建
+2. 若存在 → 读取
+
+### 第 2 步：研判用户意图
+
+按 §6 研判，确定要执行的目标阶段。
+
+### 第 3 步：检查前置条件
+
+检查目标阶段所需的前置文件是否存在（如 06 需要 05 的 latest_result.yaml）。若缺失，回退到第一个缺失的前置阶段。
+
+### 第 4 步：执行阶段
+
+调用对应的 `/XX-name-...` skill。auto **自身不执行阶段工作**——它将控制权交给对应的 XX-name skill。
+
+协作模式下，每个阶段执行前可简述"即将执行 grant-0X：...（一句话说明）"。
+
+### 第 5 步：读取 Result 并更新状态
+
+阶段执行完毕后：
+1. 读该阶段的 result 文件
+2. 更新 `proposal_state.yaml`：
+   - 该阶段的 `status` → `completed`（或 `blocked`）
+   - `completed_at` 时间戳
+   - 从 result 中提取关键质量指标更新 `quality` 字段
+   - 审阅阶段：更新 `review_loop.p0_issues_remaining`
+3. 追加 `history` 记录
+
+### 第 6 步：研判下一步
+
+按 §5 的路由逻辑，确定下一步：
+- 线性下一阶段 → 继续
+- 进入循环 → 回到循环起点
+- 到达终点（11 completed）→ 祝贺，总结全流程
+- 阻塞 → 报告阻塞原因，等待用户
+
+### 第 7 步：汇报
+
+简洁汇报：
+```text
+[stage] → completed
+下一步：[next_stage]
+```
+
+不要展开阶段内部的工作细节（那是各个 skill 自己的输出）。
+
+## 8. 模式行为差异
+
+| 行为 | 协作模式 | 自动模式 |
+|---|---|---|
+| 调研循环决策 | 每轮结束暂停，询问用户 | 自行判断，达到条件自动跳出 |
+| 写作循环 | 每 unit 完成后可继续或暂停 | 连续写直到全部完成 |
+| P0 审阅修复 | 列出 P0 建议，等用户确认后修复 | 自动回灌标记，重新 08→09→10 |
+| 阶段间过渡 | 简述下一步，不暂停 | 不暂停，直接执行 |
+| 阻塞（缺材料） | 暂停，列出所需材料 | 暂停（阻塞不可自动解决） |
+| 阶段内部细节 | 透传 XX-name 的输出 | 透传 XX-name 的输出 |
+
+## 9. 断点续跑
+
+`proposal_state.yaml` 是唯一的断点记录。恢复时：
+
+1. 读 `stages`，找到第一个 `status: pending` 的阶段
+2. 检查该阶段的前置条件（上一阶段的 result 文件是否存在且有效）
+3. 若前置条件不满足（如文件被删除），回退到上一个阶段，标记为 pending
+4. 从中断处继续执行
+
+支持跨会话恢复：用户在新对话中 `/grant-master:auto`，auto 读 `proposal_state.yaml` 即知道上次执行到哪里。
+
+## 10. 质量要求
+
+1. 不执行具体工作——调研/写作/审阅委托给对应 skill；
+2. `proposal_state.yaml` 每次操作后立即更新；
+3. 阶段 result 文件缺失时不静默跳过——标记为 blocked 并报告；
+4. 循环次数不超过上限（调研 max 5 轮、审阅修复 max 3 轮）；
+5. 自动模式下，阻塞仍需人工介入（不自动跳过）；
+6. 最终响应简洁——不展开阶段内部细节；
+7. 不修改任何 XX-name skill 的输出文件。

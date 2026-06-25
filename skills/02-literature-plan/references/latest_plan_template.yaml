@@ -1,0 +1,10 @@
+latest_round: 1
+latest_round_dir: "workflow/02_literature_plan/round_01"
+long_plan: "workflow/02_literature_plan/long_plan.yaml"
+long_plan_snapshot: "workflow/02_literature_plan/round_01/long_plan.yaml"
+research_archive: "workflow/02_literature_plan/research_archive.yaml"
+latest_round_goal: "workflow/02_literature_plan/round_01/round_goal.md"
+latest_search_queries: "workflow/02_literature_plan/round_01/search_queries.yaml"
+latest_plan_result: "workflow/02_literature_plan/round_01/plan_result.yaml"
+recommended_next_stage: "ACADEMIC_SEARCH"
+expected_academic_search_dir: "workflow/03_academic_search/round_01"

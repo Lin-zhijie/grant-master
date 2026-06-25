@@ -1,0 +1,152 @@
+# proposal_state.yaml —— auto 全局状态中枢
+# 放在项目根目录，由 auto 独享读写
+# 各阶段 skill 不读取此文件
+
+version: "1.0"
+last_updated: ""
+
+# ============================================================
+# 项目元信息
+# ============================================================
+project:
+  title: ""
+  type: ""                    # NSFC_青年 / NSFC_面上 / 重点 / 标书 / 基金 / unknown
+  target_words: 0
+  target_pages: 0
+
+# ============================================================
+# 阶段状态
+#   status: pending / in_progress / completed / blocked / skipped
+# ============================================================
+stages:
+  "01_topic":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/01_topic_card.md"
+    notes: ""
+  "02_literature_plan":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/02_literature_plan/latest_result.yaml"
+    notes: ""
+  "03_academic_search":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/03_academic_search/round_XX/search_summary.md"
+    notes: ""
+  "04_paper_digest":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/04_paper_digest/latest_result.yaml"
+    notes: ""
+  "05_synthesis":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/05_synthesis/latest_result.yaml"
+    notes: ""
+  "06_helm":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/06_helm/helm_result.yaml"
+    notes: ""
+  "07_outline":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/07_outline/outline_result.yaml"
+    notes: ""
+  "08_section_write":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/08_section_write/unit_result.yaml"
+    notes: ""
+  "09_assemble":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/09_assemble/assemble_result.yaml"
+    notes: ""
+  "10_review":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/10_review/review_result.yaml"
+    notes: ""
+  "11_output":
+    status: "pending"
+    completed_at: ""
+    result_file: "workflow/11_output/output_result.yaml"
+    notes: ""
+
+# ============================================================
+# 当前状态
+# ============================================================
+current:
+  stage: ""                   # 当前正在执行的 stage
+  mode: "collaborative"       # collaborative / autonomous
+  resume_point: ""            # 中断恢复点（stage 名 + 额外上下文）
+  last_action: ""             # 上次执行的操作描述
+
+# ============================================================
+# 调研循环 (02→03→04→05→02...)
+# ============================================================
+research_loop:
+  rounds_completed: 0
+  max_rounds: 5
+  auto_exit_criteria:
+    min_strong_claims: 3
+    min_papers_digested: 10
+    convergence_rounds: 2     # 连续 N 轮 synthesis 无本质变化
+  current_round_convergence: false
+  decision: ""                # continue / proceed_to_helm / pending_user
+
+# ============================================================
+# 写作循环 (08→08→...→09)
+# ============================================================
+writing_loop:
+  units_total: 0
+  units_written: 0
+  units_pending: 0
+  units_blocked: 0
+  last_unit_written: ""
+
+# ============================================================
+# 审阅→修复 循环 (10→08→09→10...)
+# ============================================================
+review_loop:
+  iterations: 0
+  p0_issues_remaining: 0
+  max_iterations: 3
+
+# ============================================================
+# 模式控制
+# ============================================================
+mode_settings:
+  collaborative:
+    pause_at_gates: true
+    pause_between_stages: false
+    require_confirmation_for_blocked: true
+  autonomous:
+    pause_at_gates: false
+    pause_between_stages: false
+    require_confirmation_for_blocked: true   # 阻塞仍需人工
+
+# ============================================================
+# 质量追踪（各阶段 quality score 汇总）
+# ============================================================
+quality:
+  gap_strength: "unknown"     # weak / medium / strong
+  evidence_strong_claims: 0
+  papers_digested: 0
+  argument_chain_score: 0.0
+  outline_depth_score: 0.0
+  volume_balance_score: 0.0
+  review_p0_count: 0
+  ready_for_output: false
+
+# ============================================================
+# 运行记录
+# ============================================================
+history:
+  - timestamp: ""
+    action: ""
+    stage: ""
+    result: ""                # completed / blocked / error
+    note: ""

@@ -1,0 +1,289 @@
+---
+name: 11-output
+description: >
+  中文项目申请书写作流程第 11 阶段工具：文档输出。
+  读取 09-assemble 的完整草稿 proposal_draft.md，使用 pandoc 和 Template.docx 作为样式参考，
+  转换为格式规范的 .docx 文件。用户无需手动调整格式——模板的字体、标题样式、页边距等自动继承。
+
+  当用户输入 /grant-master:11-output，或在 grant 工作流中审阅通过后需要输出最终 docx 时，使用本 Skill。
+
+  本 Skill 是 10-review 的下游，是 grant skill 链条的终点。
+  它只负责格式转换和输出质量验证，不修改正文内容、不执行审阅。
+---
+
+# 11-output：文档输出
+
+## 1. 阶段定位
+
+本 Skill 负责中文项目申请书 workflow 的第 11 阶段：**文档输出**。
+
+```text
+09_assemble（proposal_draft.md）
+  + references/Template.docx
+    ↓
+11_output（本 Skill）
+  ├── 预处理 markdown（图表占位、表格）
+  ├── pandoc 转换（--reference-doc=Template.docx）
+  ├── 输出 proposal.docx
+  ├── 后处理验证（字体、样式、页数）
+  └── 输出 output_result.yaml
+    ↓
+  用户直接提交 proposal.docx，无需手动调格式
+```
+
+核心职责：**将 markdown 草稿转换为格式规范的 .docx，让用户拿到即可提交**。
+
+---
+
+## 2. 工作目录与文件约定
+
+```text
+./
+├── references/
+│   └── Template.docx              # 申请书模板（读，作为样式参考）
+├── workflow/
+│   ├── 09_assemble/
+│   │   └── proposal_draft.md      # 完整草稿（读，不修改）
+│   └── 11_output/
+│       ├── proposal.docx          # 最终输出（写）
+│       └── output_result.yaml     # 阶段状态（写）
+```
+
+---
+
+## 3. 状态管理边界
+
+- 本 Skill 是链条终点，只输出、不修改上游任何文件。
+- `./proposal_state.yaml`：绝不读取、修改或创建。
+
+---
+
+## 4. 输入文件
+
+### L1：主输入（默认必读）
+
+```text
+workflow/09_assemble/proposal_draft.md    # 待转换的完整草稿
+./references/Template.docx                # 申请书模板（样式参考）
+```
+
+### L2：验证参考（默认必读）
+
+```text
+workflow/07_outline/outline_report.md     # §4 体量预算（验证页数）
+workflow/10_review/review_result.yaml     # 确认审阅已通过（P0=0）
+```
+
+---
+
+## 5. 职责边界
+
+### 可以做
+
+1. 读取 proposal_draft.md 和 Template.docx；
+2. 预处理 markdown（图表占位转 pandoc 语法、表格格式化）；
+3. 使用 pandoc + reference-doc 转换为 .docx；
+4. 验证输出质量（字体、样式继承、页数）；
+5. 如果 pandoc 不可用或模板缺失，给出明确的安装/修复指引。
+
+### 不允许做
+
+1. 不修改 proposal_draft.md 的内容；
+2. 不重新执行审阅；
+3. 如果 review_result.yaml 显示有 P0 未解决，应警告但不阻塞。
+
+---
+
+## 6. 转换流程
+
+### 6.1 环境检查
+
+检查 pandoc 是否可用：
+
+```bash
+pandoc --version
+```
+
+若不可用：提示安装 `pandoc`（`sudo apt install pandoc`）。
+
+检查 Template.docx 是否存在。若不存在：使用 pandoc 默认样式（`--standalone`），并在结果中标注。
+
+### 6.2 Template.docx 样式验证
+
+**在调用 pandoc 之前**，必须检查 Template.docx 是否定义了 pandoc 所需的样式。
+
+```bash
+python3 -c "
+import zipfile, xml.etree.ElementTree as ET
+with zipfile.ZipFile('./references/Template.docx') as z:
+    with z.open('word/styles.xml') as f:
+        tree = ET.parse(f)
+ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+style_ids = set()
+for s in tree.getroot().findall('.//w:style', ns):
+    sid = s.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}styleId')
+    style_ids.add(sid)
+required = ['Normal', 'Heading1', 'Heading2', 'Heading3', 'Heading4']
+# pandoc uses 'Heading1' (no space) as the internal ID
+for r in required:
+    status = 'YES' if r in style_ids else 'MISSING'
+    print(f'  {r:12s} → {status}')
+"
+```
+
+| 样式 ID | Pandoc 用途 | 缺失后果 |
+|---|---|---|
+| `Normal` | 正文段落 | 无默认字体/行距 |
+| `Heading1` | `#` 一级标题 | 回退到 Calibri 蓝字 |
+| `Heading2` | `##` 二级标题 | 回退到 Calibri 蓝字 |
+| `Heading3` | `###` 三级标题 | 回退到 Calibri 蓝字 |
+| `Heading4` | `####` 四级标题 | 回退到 Calibri 蓝字 |
+
+> **注意**：Pandoc 使用的内部样式 ID 是英文的 `Normal`、`Heading1`（无空格）、`Heading2` 等。即使 Word/WPS 界面显示为"正文""标题 1"，内部 ID 不变。
+
+如果任何必需样式缺失：
+- **不阻塞**，改为使用 skill 内置的 `references/default_reference.docx` 作为 `--reference-doc`
+- 内置文档包含完整的 Normal + Heading 1-4 样式（宋体正文 + 黑体/楷体标题）
+- 副作用：使用内置文档会丢失 Template.docx 的页边距、页眉页脚等自定义设置
+- 在 output_result.yaml 中标记 `template_styles_incomplete: true` 和 `used_fallback_reference: true`
+- 在最终响应中提醒用户完善 Template.docx 后重新转换可获得更好的格式效果
+
+#### 6.2.1 样式修复指引
+
+告诉用户在 Word/WPS 中打开 `references/Template.docx`，按以下规格创建/修改样式：
+
+| 样式名称（界面显示） | 内部 ID | 字体 | 字号 | 加粗 | 对齐 |
+|---|---|---|---|---|---|
+| 正文 | Normal | 宋体/仿宋 | 小四(~11pt) | — | 两端对齐，首行缩进2字符 |
+| 标题 1 | Heading 1 | 黑体 | 三号(~16pt) | ✅ | 居中 |
+| 标题 2 | Heading 2 | 黑体 | 四号(~14pt) | ✅ | 左对齐 |
+| 标题 3 | Heading 3 | 黑体 | 小四(~12pt) | ✅ | 左对齐 |
+| 标题 4 | Heading 4 | 楷体/黑体 | 小四(~11pt) | ✅ | 左对齐 |
+
+页边距：A4，上下 2.5cm，左右 2-3cm。
+
+### 6.3 标题编号处理
+
+**推荐路径**：先 `/grant-master:09-assemble --no-numbers`（输出干净标题），再用本阶段转 docx。Word 的 Heading 1-4 样式自带自动编号（需在 reference docx 中定义），无需在 markdown 中硬编码编号。
+
+如果 draft 中已含编号（如 09-assemble 默认注入的），保留不动——pandoc 会原样输出标题文字。
+
+### 6.4 Markdown 预处理
+
+在调用 pandoc 之前，对 proposal_draft.md 做以下预处理：
+
+**图表占位**：将 `> **[图 X：{标题}]** *{描述}*` 保留为 blockquote——pandoc 会转为 Word 中的缩进段落。
+
+**表格**：markdown 表格直接由 pandoc 转换为 Word 表格。
+
+**参考文献**：如果正文中有 `[1]` `[2]` 等引用标记，保持不变。pandoc 会保留为纯文本。
+
+### 6.5 Pandoc 转换
+
+```bash
+# REFDOC 取值逻辑：
+#   若 §6.2 样式检查全部通过 → ./references/Template.docx
+#   若任何样式缺失       → {skill_references_dir}/default_reference.docx
+REFDOC="./references/Template.docx"
+# 或 REFDOC="{skill_references_dir}/default_reference.docx"（fallback）
+
+pandoc workflow/09_assemble/proposal_draft.md \
+  --reference-doc="$REFDOC" \
+  --from=markdown \
+  --to=docx \
+  --output=workflow/11_output/proposal.docx \
+  --standalone \
+  --metadata title="[项目名称]"
+```
+
+`--reference-doc` 参数使输出的 .docx 继承参考文档的全部样式：
+- 页面设置（页边距、纸张大小）
+- 标题样式（字体、字号、颜色、间距）
+- 正文样式
+- 页眉页脚
+- 若使用 fallback 文档，上述设置来自内置默认值而非用户模板
+
+### 6.6 后处理验证
+
+生成 .docx 后执行验证：
+
+| 验证项 | 方法 | 不通过的后果 |
+|---|---|---|
+| 文件可打开 | 检查文件大小 > 0，非空白 | error |
+| 标题样式正确应用 | 用 pandoc 的 `--verbose` 或检查输出日志 | warning |
+| 页数在预算范围内 | 估算：总字数 ÷ 750 ≈ 页数（粗略） | info |
+| 中文未乱码 | 无法直接验证，标记为需用户确认 | info |
+
+---
+
+## 7. 执行流程
+
+### 第 1 步：读取草稿和模板
+
+1. 读取 proposal_draft.md 全文
+2. 确认 Template.docx 存在且可读
+3. 检查 pandoc 可用
+
+### 第 2 步：审阅状态确认
+
+读取 review_result.yaml：
+- `P0_count == 0` → 继续
+- `P0_count > 0` → 警告用户存在未解决的 P0 问题，询问是否继续
+
+### 第 3 步：执行预处理
+
+对 proposal_draft.md 执行 §6.2 的预处理（写入临时文件 /tmp/proposal_preprocessed.md）
+
+### 第 4 步：执行 pandoc 转换
+
+执行 §6.3 的 pandoc 命令。
+
+### 第 5 步：验证输出
+
+执行 §6.4 的验证，生成报告。
+
+### 第 6 步：写 output_result.yaml
+
+---
+
+## 8. 输出文件结构
+
+```text
+workflow/11_output/
+  proposal.docx
+  output_result.yaml
+```
+
+---
+
+## 9. 最终响应格式
+
+```text
+已完成第 11 阶段：文档输出。
+
+输出文件：workflow/11_output/proposal.docx
+模板参考：references/Template.docx
+总页数（估算）：X 页（目标 Y 页）
+
+验证结果：
+- 文件生成：✅
+- 样式继承：✅（来自 Template.docx）
+- 页数估算：X 页（偏差 Z%）
+
+用户需手动确认：
+- 中文未乱码
+- 图表占位是否需替换为实际图片
+- 页数是否在申报要求范围内
+
+这是 grant skill 链条的终点。如需修改内容，回灌到具体 unit 重写后重新 09→10→11。
+```
+
+---
+
+## 10. 质量要求
+
+1. 不修改 proposal_draft.md 的内容；
+2. 必须使用 Template.docx 作为 reference-doc；
+3. pandoc 不可用时给出清晰的安装指引，不阻塞；
+4. P0 未解决时警告但不阻塞；
+5. 最终响应中不要执行其他 Skill。

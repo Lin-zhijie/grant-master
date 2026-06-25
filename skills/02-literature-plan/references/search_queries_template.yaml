@@ -1,0 +1,84 @@
+stage: "LITERATURE_PLAN"
+round: 1
+version: "v1"
+purpose: "为第 03 阶段 academic-search 生成本轮精准查询计划"
+
+basis:
+  primary:
+    - ""
+  previous_plan:
+    - "workflow/02_literature_plan/long_plan.yaml"
+  optional:
+    - ""
+
+long_plan_context:
+  selected_task_ids:
+    - ""
+  skipped_task_ids_this_round:
+    - ""
+  reason_for_selection: ""
+
+round_goal:
+  type: "background"       # background / core / technical / iterative
+  main_task_id: ""
+  auxiliary_task_ids: []
+  one_sentence_goal: ""
+
+search_scope:
+  must_search:
+    - ""
+  should_search:
+    - ""
+  do_not_search:
+    - ""
+
+queries:
+  - id: "Q1"
+    target_question: ""
+    keywords_zh:
+      - ""
+    keywords_en:
+      - ""
+    query_strings:
+      - ""
+    priority: "high"
+    expected_paper_types:
+      - "system paper"
+    preferred_venues:
+      - ""
+    exclude:
+      - ""
+    rationale: ""
+
+selection_policy:
+  target_total_papers: 10
+  target_core_papers: 5
+  prefer_recent_years: "last 5 years"
+  include_classic_papers: true
+  prefer_venues:
+    - "NSDI"
+    - "SIGCOMM"
+    - "OSDI"
+    - "SOSP"
+    - "FAST"
+    - "ATC"
+    - "EuroSys"
+    - "SC"
+    - "MLSys"
+  exclude_rules:
+    - ""
+  ranking_rules:
+    - ""
+
+expected_academic_search_outputs:
+  output_dir: "workflow/03_academic_search/round_01"
+  files:
+    - "search_results.yaml"
+    - "candidate_papers.md"
+    - "download_queue.yaml"
+    - "search_summary.md"
+
+manual_download_policy:
+  mark_needs_institution: true
+  do_not_bypass_paywalls: true
+  user_download_dir: "references/papers/inbox"

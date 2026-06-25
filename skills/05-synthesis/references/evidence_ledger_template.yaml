@@ -1,0 +1,58 @@
+stage: "SYNTHESIS"
+version: "v1"
+updated_after_round: 1
+
+claims:
+  - id: "CL001"
+    claim: ""
+    claim_type: "fact"         # fact / method / limitation / gap / baseline / metric / risk / inspiration
+    status: "supported"        # supported / partial / contradicted / unresolved
+    evidence_level: "medium"   # strong / medium / weak / contradict / unknown
+    sources:
+      - paper_id: ""
+        title: ""
+        round: 1
+        report: "workflow/04_paper_digest/round_01/papers/xxx.md"
+        evidence_summary: ""
+    related_tasks:
+      - ""
+    related_gap: ""
+    implication_for_project: ""
+    usable_for_helm: true
+    usable_for_application_text: false
+    caveat: ""
+
+hypotheses:
+  - id: "H001"
+    hypothesis: ""
+    source: "01_literature_seed"  # 01_literature_seed / long_plan / synthesis / user
+    status: "unresolved"          # confirmed / partially / rejected / refined / unresolved
+    evidence:
+      - "CL001"
+    next_action: ""
+
+gap_candidates:
+  - id: "G001"
+    description: ""
+    confidence: "medium"          # low / medium / high
+    scene_match: 0.0
+    constraint_match: 0.0
+    existing_coverage: ""
+    missing_piece: ""
+    importance: 0.0
+    solvability: 0.0
+    verifiability: 0.0
+    risk: ""
+    evidence_claims:
+      - "CL001"
+    helm_candidate: false
+
+technical_inspirations:
+  - id: "TI001"
+    description: ""
+    inspired_by:
+      - "CL001"
+    related_gap: "G001"
+    possible_module: ""
+    validation_hint: ""
+    confidence: "medium"          # low / medium / high

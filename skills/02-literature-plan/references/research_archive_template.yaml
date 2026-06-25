@@ -1,0 +1,39 @@
+stage: "LITERATURE_PLAN"
+last_updated_round: 1
+total_rounds_completed: 1
+total_tasks_completed: 0
+total_tasks_skipped: 0
+
+completed_tasks:
+  - id: "C1"
+    name: ""
+    status: "searched"      # searched / digested / synthesized / completed
+    completed_in_round: 1
+    related_rounds:
+      - 1
+    evidence_found: ""      # 简述找到了什么证据或结论
+    notes: ""
+
+skipped_tasks:
+  - id: "B1"
+    name: ""
+    status: "skipped"
+    skipped_in_round: 1
+    skip_source: ""         # 来自哪个文件或用户何时指出
+    reason: ""              # 跳过的具体理由
+    notes: ""
+
+round_summary:
+  - round: 1
+    short_goal: ""
+    tasks_executed:
+      - ""
+    tasks_marked_skipped:
+      - ""
+    outcome: ""             # 本轮产出简述
+
+pending_overview:
+  remaining_core_tasks: 0
+  remaining_technical_tasks: 0
+  remaining_iterative_tasks: 0
+  next_priority_task_id: ""

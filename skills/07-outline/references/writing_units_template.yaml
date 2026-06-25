@@ -1,0 +1,216 @@
+stage: "OUTLINE"
+version: "v3"
+
+purpose: >
+  将申请书大纲 section tree 的每个节点拆解为可执行、可扩写、可追踪的 writing units。
+  每个 section（不论叶/非叶）至少 1 个 unit：
+    - 非叶结点：1 个 section_intro unit（needs_intro_paragraph 决定是否写开篇段落）
+    - 叶结点：1+ 个 unit
+
+global_rules:
+  unit_granularity: "叶结点 unit 通常 600-1500 字；section_intro 通常 0-500 字。"
+  writing_mode: "08-section-write 应逐 unit 写作，而不是一次写完整章节。"
+  expansion_rule: "每个 unit 必须包含论点、背景、技术解释、证据、项目关系、指标或验证方式中的多项。"
+  section_id_rule: "unit 的 section_id 指向所属 section ID（不论叶/非叶）。"
+  unit_id_rule: "格式为 {section_id}-U{NNN}。如 S01.2-U001、S01.2.1-U001。"
+  every_section_has_units: "每个 section 至少 1 个 unit。非叶结点恰好 1 个 section_intro unit。"
+  heading_output: >
+    每个 section 的 is_first_unit_of_section=true 的 unit 写该级标题。
+    同一 section 的后续 unit 以正文段落衔接，不重复同级标题。
+
+# ============================================================
+# sections：与 outline_state.yaml 的 section tree 同构
+# 每个 section（不论叶/非叶）都列出其 units
+# ============================================================
+sections:
+  # ---- 非叶结点示例 ----
+  - section_id: "S01"
+    heading: ""
+    heading_number: "1"             # 由 section_id 派生：去掉 "S" 前缀
+    level: 1
+    is_leaf: false
+    target_words: 0
+    units:
+      - unit_id: "S01-U001"
+        section_id: "S01"
+        heading_level: 1
+        heading_number: "1"         # 继承自所属 section
+        is_first_unit_of_section: true
+        unit_type: "section_intro"
+        needs_intro_paragraph: false      # true=标题+简短开篇 / false=仅写标题
+        priority: "high"
+        status: "pending"
+        blocked_reason: ""
+        title: ""
+        target_words: 0                   # heading-only 时为 0
+        target_pages: 0
+        purpose: ""
+        role_in_document: ""
+        core_argument: ""
+        required_elements: []
+        paragraph_slots: []               # heading-only 时为空
+        sources:
+          helm: []
+          synthesis: []
+          evidence_claims: []
+          papers: []
+          other: []
+        avoid:
+          - ""
+        output_file: "workflow/08_section_write/units/S01-U001.md"
+        writing_notes: "heading-only：只写 # 标题行，不生成正文段落。"
+
+  # ---- 非叶结点需要 intro 示例 ----
+  - section_id: "S01.2"
+    heading: ""
+    heading_number: "1.2"
+    level: 2
+    is_leaf: false
+    target_words: 0
+    units:
+      - unit_id: "S01.2-U001"
+        section_id: "S01.2"
+        heading_level: 2
+        heading_number: "1.2"
+        is_first_unit_of_section: true
+        unit_type: "section_intro"
+        needs_intro_paragraph: true       # 需要开篇段落
+        priority: "high"
+        status: "pending"
+        blocked_reason: ""
+        title: ""
+        target_words: 300                 # 简短开篇段落 150-500 字
+        target_pages: 0.4
+        purpose: "引导读者进入本节，说明本节的组织逻辑和内容结构。"
+        role_in_document: ""
+        core_argument: ""
+        required_elements:
+          - "本节要回答什么问题"
+          - "本节内容组织方式（由哪些子节构成）"
+        paragraph_slots:
+          - slot_id: "P1"
+            role: "本节引言"
+            target_words: 300
+            must_include:
+              - "本节在全书论证链中的角色"
+              - "本节内容结构概述"
+            source_hints:
+              - "outline_report.md 本节关键句"
+            avoid:
+              - "过度展开具体内容"
+              - "重复子节标题列表"
+        sources:
+          helm: []
+          synthesis: []
+          evidence_claims: []
+          papers: []
+          other: []
+        avoid:
+          - "深入子节的技术细节"
+          - "空泛的意义描述"
+        output_file: "workflow/08_section_write/units/S01.2-U001.md"
+        writing_notes: "简短开篇，1-2 段即可。让读者知道本节要讲什么、怎么组织。"
+
+  # ---- 叶结点示例 ----
+  - section_id: "S01.2.1"
+    heading: ""
+    heading_number: "1.2.1"
+    level: 3
+    is_leaf: true
+    target_words: 0
+    units:
+      - unit_id: "S01.2.1-U001"
+        section_id: "S01.2.1"
+        heading_level: 3
+        heading_number: "1.2.1"
+        is_first_unit_of_section: true
+        unit_type: "background"            # section_intro / background / related_work / gap / objective / content / route / innovation / validation / foundation / other
+        needs_intro_paragraph: null        # 仅 section_intro 类型有效
+        priority: "high"
+        status: "pending"
+        blocked_reason: ""
+        title: ""
+        target_words: 1200
+        target_pages: 1.6
+        purpose: ""
+        role_in_document: ""
+        core_argument: ""
+        required_elements:
+          - ""
+        paragraph_slots:
+          - slot_id: "P1"
+            role: "引入本单元问题"
+            target_words: 150
+            must_include:
+              - ""
+            source_hints:
+              - ""
+            avoid:
+              - ""
+          - slot_id: "P2"
+            role: "展开背景或已有方法"
+            target_words: 250
+            must_include:
+              - ""
+            source_hints:
+              - ""
+            avoid:
+              - ""
+          - slot_id: "P3"
+            role: "分析挑战或不足"
+            target_words: 250
+            must_include:
+              - ""
+            source_hints:
+              - ""
+            avoid:
+              - ""
+          - slot_id: "P4"
+            role: "说明本项目思路或衔接"
+            target_words: 250
+            must_include:
+              - ""
+            source_hints:
+              - ""
+            avoid:
+              - ""
+        sources:
+          helm:
+            - "workflow/06_helm/scheme_blueprint.yaml"
+          synthesis:
+            - "workflow/05_synthesis/current_view.md"
+          evidence_claims:
+            - ""
+          papers:
+            - ""
+          other:
+            - ""
+        avoid:
+          - ""
+        output_file: "workflow/08_section_write/units/S01.2.1-U001.md"
+        writing_notes: ""
+
+# ============================================================
+# heading_output_rule（供 08-section-write 使用）
+# 适用于所有 section 类型
+# ============================================================
+heading_output_rule:
+  rule: "is_first_unit_of_section 决定是否写标题"
+  description: >
+    每个 section 的 is_first_unit_of_section=true 的 unit 写 heading_level 级标题。
+    同一 section 的后续 unit 以正文段落开始（可用更低级子标题），不重复同级标题。
+  section_intro_heading_only: >
+    unit_type=section_intro 且 needs_intro_paragraph=false 时：
+    只写 heading_level 级标题行，不生成任何正文段落。
+    该 section 的内容由第一个子级 section 的 unit 直接开始。
+
+metadata:
+  total_sections: 0
+  total_non_leaf_sections: 0
+  total_leaf_sections: 0
+  total_units: 0
+  section_intro_units: 0
+  heading_only_units: 0
+  high_priority_units: 0
+  blocked_units: 0
+  total_target_words: 0

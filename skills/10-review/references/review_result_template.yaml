@@ -1,0 +1,60 @@
+stage: "REVIEW"
+status: "completed"
+can_continue: true
+recommended_next_stage: "OUTPUT"
+
+review_target:
+  draft_file: "workflow/09_assemble/proposal_draft.md"
+  total_words: 0
+
+dimensions:
+  D1_argument_chain:
+    status: "pass"                  # pass / issues_found
+    issues_count: 0
+  D2_cross_section_transitions:
+    status: "pass"
+    issues_count: 0
+  D3_evidence_consistency:
+    status: "pass"
+    issues_count: 0
+  D4_forbidden_content:
+    status: "pass"
+    issues_count: 0
+  D5_redundancy_and_omission:
+    status: "pass"
+    issues_count: 0
+  D6_volume_balance:
+    status: "pass"
+    issues_count: 0
+  D7_style_and_readability:
+    status: "pass"
+    issues_count: 0
+
+findings:
+  P0_blocking:
+    - id: "P0-001"
+      dimension: ""
+      severity: "P0"
+      location: ""                  # section_id / 段落描述
+      excerpt: ""                   # 原文摘录
+      problem: ""                   # 问题描述
+      suggested_fix: ""             # 修改建议
+  P1_strongly_recommended: []
+  P2_optimization: []
+
+summary:
+  total_issues: 0
+  P0_count: 0
+  P1_count: 0
+  P2_count: 0
+  ready_for_output: false           # P0=0 时为 true
+
+warnings: []
+notes: []
+
+# ============================================================
+# 阻塞时
+# ============================================================
+# status: "blocked"
+# can_continue: false
+# intervention: { required: true, reason: "", questions: [] }

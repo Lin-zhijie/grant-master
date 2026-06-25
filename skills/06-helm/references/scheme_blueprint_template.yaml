@@ -1,0 +1,106 @@
+stage: "HELM"
+version: "v1"
+
+basis:
+  - "topic.md"
+  - "workflow/05_synthesis/current_view.md"
+
+project_positioning:
+  one_sentence_mainline: ""
+  what_to_emphasize:
+    - ""
+  what_not_to_emphasize:
+    - ""
+  target_contribution_style: ""  # 如：系统论文 / 算法论文 / 工程实现
+
+selected_problem:
+  core_problem: ""
+  supporting_problems:
+    - ""
+  why_this_problem: ""
+  rejected_problem_directions:
+    - name: ""
+      reason: ""
+      treatment: "background_only"   # background_only / future_work / dropped / need_more_research
+
+selected_route:
+  main_route: ""
+  route_summary: ""
+  why_this_route: ""
+  rejected_routes:
+    - name: ""
+      reason: ""
+      treatment: "background_only"
+
+system_scheme:
+  architecture_summary: ""
+  modules:
+    - id: "M1"
+      name: ""
+      role: ""
+      solves_problem: ""
+      method: ""
+      input: ""
+      output: ""
+      depends_on: []
+      validation: ""
+  data_flow:
+    - ""
+  control_flow:
+    - ""
+  fallback:
+    - ""
+  security_boundary:
+    - ""
+
+research_contents:
+  - id: "R1"
+    title: ""
+    problem: ""
+    method: ""
+    expected_result: ""
+    validation: ""
+
+validation_plan:
+  baselines:
+    - ""
+  metrics:
+    - ""
+  experiment_scenarios:
+    - ""
+  module_validation:
+    - ""
+  end_to_end_validation:
+    - ""
+  user_confirm_needed:
+    - ""
+
+outline_guidance:
+  background_focus:
+    - ""
+  related_work_focus:
+    - ""
+  gap_expression:
+    - ""
+  objective_expression:
+    - ""
+  research_content_structure:
+    - ""
+  technical_route_expression:
+    - ""
+  innovation_expression:
+    - ""
+  validation_expression:
+    - ""
+  avoid_writing:
+    - ""
+
+quality:
+  focus_score: 0.0
+  completeness_score: 0.0
+  innovation_score: 0.0
+  feasibility_score: 0.0
+  validation_score: 0.0
+
+notes:
+  - ""

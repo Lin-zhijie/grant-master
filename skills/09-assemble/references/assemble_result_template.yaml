@@ -1,0 +1,60 @@
+stage: "ASSEMBLE"
+status: "completed"
+can_continue: true
+recommended_next_stage: "REVIEW"
+
+assembly:
+  draft_file: "workflow/09_assemble/proposal_draft.md"
+  pdf_file: "workflow/09_assemble/proposal_draft.pdf"
+  pdf_status: "generated"           # generated / skipped_weasyprint_unavailable / skipped_error
+  pdf_page_count: 0
+  heading_numbers_injected: 0       # 安全网修复的缺失编号数
+  total_units_expected: 0
+  total_units_assembled: 0
+  missing_units: []
+  blocked_units: []
+
+checks:
+  completeness:
+    status: "pass"                  # pass / warning / error
+    missing_unit_files: []
+    empty_unit_files: []
+    summary: ""
+  heading_levels:
+    status: "pass"
+    max_depth: 0
+    level_jumps: []                 # 跳级位置（如 L2→L4）
+    heading_mismatches: []          # 标题与 outline 不一致的位置
+    summary: ""
+  word_count:
+    status: "pass"
+    total_words: 0
+    target_words: 0
+    deviation_pct: 0.0
+    by_section:
+      - section_id: ""
+        target: 0
+        actual: 0
+        deviation_pct: 0.0
+    over_20pct_sections: []
+    summary: ""
+  terminology:
+    status: "pass"
+    terms_checked: 0
+    inconsistent_terms: []
+    summary: ""
+
+severity:
+  errors: 0
+  warnings: 0
+  info: 0
+
+warnings: []
+notes: []
+
+# ============================================================
+# 阻塞时
+# ============================================================
+# status: "blocked"
+# can_continue: false
+# intervention: { required: true, reason: "", questions: [] }

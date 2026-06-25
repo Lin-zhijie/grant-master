@@ -1,0 +1,82 @@
+stage: "OUTLINE"
+version: "v2"
+
+# ============================================================
+# volume_budget.yaml —— 章节体量预算
+#
+# section tree 递归结构：
+#   每个 section（不管是否叶结点）都有 target_words。
+#   非叶结点的 target_words 应等于其 children 的 target_words 之和。
+#   叶结点的 target_words 应等于其 units 的 target_words 之和。
+# ============================================================
+
+document_target:
+  document_type: ""              # NSFC / grant / proposal / bid / unknown
+  target_pages: 0
+  target_words: 0
+  source: ""                     # requirements / user_specified / template / default
+  needs_user_confirmation: false
+  words_per_page_assumption: 750
+  notes:
+    - ""
+
+allocation_policy:
+  principle: "按论证权重分配体量，不平均分配。"
+  high_density_sections:
+    - ""
+  low_density_sections:
+    - ""
+  avoid_expanding:
+    - "dropped directions"
+    - "background_only directions beyond brief context"
+    - "形式性栏目"
+
+# ============================================================
+# sections：递归树，与 outline_state 的 section tree 同构
+# ============================================================
+sections:
+  - section_id: "S01"
+    heading: ""
+    level: 1
+    template_heading_original: ""
+    is_leaf: false
+    target_pages: 0
+    target_words: 0
+    min_words: 0
+    max_words: 0
+    expansion_density: "medium"       # low / medium / high / very_high
+    role_in_document: ""
+    rationale: ""
+    children:
+      - section_id: "S01.1"
+        heading: ""
+        level: 2
+        is_leaf: true
+        target_pages: 0
+        target_words: 0
+        expansion_density: "low"
+        role_in_document: ""
+        rationale: ""
+        children: []                  # 叶结点 children 为空
+        # 更深层级示例（需要时取消注释）：
+        #
+        # - section_id: "S01.2.1"
+        #   heading: ""
+        #   level: 2               # 可能是 3/4/5
+        #   is_leaf: true
+        #   target_pages: 0
+        #   target_words: 0
+        #   expansion_density: "high"
+        #   role_in_document: ""
+        #   rationale: ""
+        #   children: []
+
+summary:
+  total_sections: 0
+  total_leaf_sections: 0
+  max_depth: 0
+  total_target_pages: 0
+  total_target_words: 0
+  high_density_count: 0
+  needs_user_confirmation: false
+  cross_check: "各 section target_words 之和 ≈ document_target.target_words"

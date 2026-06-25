@@ -1,0 +1,76 @@
+# ============================================================
+# 正常生成时使用以下格式
+# ============================================================
+stage: "TOPIC_UNDERSTANDING"
+version: "v0"
+purpose: "为第一轮 grant-literature-plan 提供调研种子"
+
+basis:
+  - "topic.md"
+  - "requirements.md if available"
+  - "applicant_profile.md if available"
+  - "references/ if available"
+
+search_axes:
+  - id: "A1"
+    name: ""
+    goal: ""
+    verify_questions:
+      - ""
+    keywords_zh:
+      - ""
+    keywords_en:
+      - ""
+    priority: "high"
+    rationale: ""
+
+initial_hypotheses:
+  - ""
+
+must_verify:
+  - ""
+
+avoid_claiming_as_fact:
+  - ""
+
+possible_existing_work_signals:
+  - name: ""
+    source: ""
+    why_relevant: ""
+    verification_needed: ""
+
+manual_inputs_needed:
+  - ""
+
+notes:
+  - "这些调研种子不是文献综述结论，只用于生成第一轮 academic-search 查询计划。"
+
+# 字段说明：
+# search_axes: 第一轮调研方向
+# initial_hypotheses: 从 topic 初步推导出的假设
+# must_verify: 后续调研必须验证的问题
+# avoid_claiming_as_fact: 当前阶段不能当作事实写入申请书的内容
+# possible_existing_work_signals: 如果已有材料中出现论文、系统、专利或技术名称，
+#   只能作为"可能相关线索"记录，不能声称为已验证事实
+# manual_inputs_needed: 需要用户后续补充的信息
+
+# ============================================================
+# 阻塞时（topic.md 缺失或为空）使用以下格式
+# ============================================================
+# stage: "TOPIC_UNDERSTANDING"
+# version: "v0"
+# purpose: "为第一轮 grant-literature-plan 提供调研种子"
+# status: "blocked"
+#
+# basis: []
+# search_axes: []
+# initial_hypotheses: []
+# must_verify: []
+# avoid_claiming_as_fact: []
+# possible_existing_work_signals: []
+#
+# manual_inputs_needed:
+#   - "请先填写 topic.md。"
+#
+# notes:
+#   - "topic.md 缺失或为空，无法生成文献查找种子。"

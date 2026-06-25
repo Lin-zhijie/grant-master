@@ -1,0 +1,106 @@
+stage: "OUTLINE"
+status: "completed"
+can_continue: true
+recommended_next_stage: "SECTION_WRITE"
+
+basis:
+  - "workflow/06_helm/scheme_blueprint.yaml"
+  - "workflow/06_helm/helm_report.md"
+  - "workflow/05_synthesis/current_view.md"
+  - "workflow/05_synthesis/evidence_ledger.yaml"
+  - "topic.md"
+
+outputs:
+  outline_report: "workflow/07_outline/outline_report.md"
+  volume_budget: "workflow/07_outline/volume_budget.yaml"
+  writing_units: "workflow/07_outline/writing_units.yaml"
+  source_allocation: "workflow/07_outline/source_allocation.yaml"
+  outline_state: "workflow/07_outline/outline_state.yaml"
+  outline_blueprint: "workflow/07_outline/outline_blueprint.yaml"
+
+template:
+  source: ""
+  status: "parsed"            # parsed / fallback_builtin_outline / parsed_with_warnings
+  warnings: []
+
+volume:
+  target_pages: 0
+  target_words: 0
+  source: ""
+  needs_user_confirmation: false
+
+coverage:
+  total_sections: 0
+  total_leaf_sections: 0       # 大纲叶结点数
+  max_section_depth: 0         # 大纲最大深度（1-5）
+  total_writing_units: 0
+  high_priority_units: 0
+  blocked_units: 0
+  references_papers_count: 0
+  evidence_claims_count: 0
+  data_points_count: 0
+
+quality:
+  outline_depth_score: 0.0
+  volume_planning_score: 0.0
+  unit_decomposition_score: 0.0
+  source_allocation_score: 0.0
+  helm_alignment_score: 0.0
+  writability_score: 0.0
+
+intervention:
+  required: false
+  reason: ""
+  questions: []
+
+notes:
+  - "本阶段完成申请书内容架构与体量规划，下一阶段应进入 08-section-write。"
+
+# ============================================================
+# 阻塞时使用以下格式
+# ============================================================
+# stage: "OUTLINE"
+# status: "blocked"
+# can_continue: false
+# recommended_next_stage: ""
+# basis: []
+# outputs:
+#   outline_report: ""
+#   volume_budget: ""
+#   writing_units: ""
+#   source_allocation: ""
+#   outline_state: ""
+#   outline_blueprint: ""
+# template:
+#   source: ""
+#   status: ""
+#   warnings: []
+# volume:
+#   target_pages: 0
+#   target_words: 0
+#   source: ""
+#   needs_user_confirmation: true
+# coverage:
+#   total_sections: 0
+#   total_leaf_sections: 0
+#   max_section_depth: 0
+#   total_writing_units: 0
+#   high_priority_units: 0
+#   blocked_units: 0
+#   references_papers_count: 0
+#   evidence_claims_count: 0
+#   data_points_count: 0
+# quality:
+#   outline_depth_score: 0.0
+#   volume_planning_score: 0.0
+#   unit_decomposition_score: 0.0
+#   source_allocation_score: 0.0
+#   helm_alignment_score: 0.0
+#   writability_score: 0.0
+# intervention:
+#   required: true
+#   reason: "缺少必要输入。"
+#   questions:
+#     - "请先完成 06-helm，生成 workflow/06_helm/scheme_blueprint.yaml 和 helm_report.md。"
+# notes:
+#   - ""

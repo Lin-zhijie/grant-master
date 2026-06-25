@@ -1,0 +1,97 @@
+stage: "OUTLINE"
+version: "v3"
+
+basis:
+  - "workflow/06_helm/scheme_blueprint.yaml"
+  - "workflow/06_helm/helm_report.md"
+  - "workflow/05_synthesis/current_view.md"
+  - "workflow/05_synthesis/evidence_ledger.yaml"
+  - "topic.md"
+
+template_structure:
+  template_file: ""
+  template_status: ""       # parsed / fallback_builtin_outline / parsed_with_warnings
+  top_level_sections:
+    - id: "S01"
+      heading: ""
+      subsections_count: 0
+      max_depth_under: 0    # 该 L1 下的最大层级深度
+
+document_volume:
+  target_pages: 0
+  target_words: 0
+  source: ""
+  needs_user_confirmation: false
+  volume_budget: "workflow/07_outline/volume_budget.yaml"
+
+coverage:
+  total_sections: 0
+  total_leaf_sections: 0       # 大纲叶结点数
+  total_writing_units: 0
+  max_section_depth: 0         # 大纲最大深度（1-5）
+  high_priority_units: 0
+  blocked_units: 0
+  references_papers_count: 0
+  evidence_claims_count: 0
+  data_points_count: 0
+
+# ============================================================
+# section_tree_summary：大纲叶结点 → units 映射摘要
+# 说明每个叶结点的标题、层级和对应 unit
+# ============================================================
+section_tree_summary:
+  - leaf_section_id: "S01.1"
+    heading: ""
+    level: 2
+    unit_ids:
+      - "S01.1-U001"
+
+helm_to_outline_mapping:
+  core_problem:
+    covered_in_units: []
+  research_contents:
+    - helm_id: "R1"
+      title: ""
+      covered_in_units: []
+  modules:
+    - helm_id: "M1"
+      name: ""
+      covered_in_units: []
+  validation_plan:
+    covered_in_units: []
+  rejected_directions:
+    - name: ""
+      treatment: ""
+      mentioned_in_units: []
+
+writing_architecture:
+  writing_units: "workflow/07_outline/writing_units.yaml"
+  source_allocation: "workflow/07_outline/source_allocation.yaml"
+  outline_state: "workflow/07_outline/outline_state.yaml"
+  next_stage: "SECTION_WRITE"
+  recommended_granularity: "unit"
+  first_units_to_write:
+    - ""
+
+argument_integrity:
+  background_to_gap_chain: ""
+  gap_to_objective_chain: ""
+  objective_to_content_chain: ""
+  content_to_route_chain: ""
+  method_to_validation_chain: ""
+  innovation_verifiability: ""
+  cross_section_consistency: ""
+
+quality:
+  outline_depth_score: 0.0
+  volume_planning_score: 0.0
+  unit_decomposition_score: 0.0
+  source_allocation_score: 0.0
+  helm_alignment_score: 0.0
+  writability_score: 0.0
+
+warnings:
+  - ""
+
+notes:
+  - ""

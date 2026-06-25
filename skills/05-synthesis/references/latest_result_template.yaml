@@ -1,0 +1,7 @@
+latest_round: 1
+current_view: "workflow/05_synthesis/current_view.md"
+evidence_ledger: "workflow/05_synthesis/evidence_ledger.yaml"
+latest_synthesis_report: "workflow/05_synthesis/round_01/synthesis_report.md"
+latest_synthesis_result: "workflow/05_synthesis/round_01/synthesis_result.yaml"
+recommended_next_stage: "LITERATURE_PLAN"
+ready_for_helm: false

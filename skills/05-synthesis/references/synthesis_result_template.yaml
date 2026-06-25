@@ -1,0 +1,133 @@
+# ============================================================
+# 成功完成时使用以下格式
+# ============================================================
+stage: "SYNTHESIS"
+round: 1
+status: "completed"
+can_continue: true
+recommended_next_stage: "LITERATURE_PLAN"   # LITERATURE_PLAN / HELM
+
+outputs:
+  current_view: "workflow/05_synthesis/current_view.md"
+  evidence_ledger: "workflow/05_synthesis/evidence_ledger.yaml"
+  synthesis_report: "workflow/05_synthesis/round_01/synthesis_report.md"
+
+claim_summary:
+  new_claims: 0
+  updated_claims: 0
+  contradicted_claims: 0
+  application_usable_claims: 0
+  helm_usable_claims: 0
+
+hypothesis_status:
+  confirmed: 0
+  partially: 0
+  rejected: 0
+  refined: 0
+  unresolved: 0
+
+gap_status:
+  high_confidence_gaps: 0
+  medium_confidence_gaps: 0
+  low_confidence_gaps: 0
+  weakened_or_rejected_gaps: 0
+
+technical_inspirations:
+  count: 0
+  helm_candidate_count: 0
+
+skip_recommendations:
+  - task_id: ""
+    reason: ""
+    confidence: "high"     # low / medium / high
+    evidence_claims:
+      - ""
+
+new_research_needs:
+  - description: ""
+    priority: "high"
+    suggested_task_id: ""
+    reason: ""
+
+ready_for_helm: false               # true / false / "conditional"
+helm_readiness:
+  # 硬性门槛逐项检查（对应 SKILL.md §7.1）
+  gate_1_core_gap_confirmed: false        # ≥3 篇独立论文支撑核心 gap，evidence_level: strong，无 contradict
+  gate_2_nearest_neighbors_covered: false # 所有核心最近邻方向均已至少一轮，每方向 3-5 篇精读
+  gate_3_landscape_clear: false           # 覆盖 ≥3 个独立方向，能清楚定位课题位置
+  gate_4_technical_alternatives: false    # ≥2 个有文献支撑的候选方向，均已评估可行性/创新性/可验证性
+  gate_5_multi_round: false               # ≥2 轮调研循环已完成
+  gate_6_marginal_gain_declining: false   # 最近一轮未出现改变主线判断的重大新认知
+  remaining_blockers:
+    - ""
+  reason: ""
+
+intervention:
+  required: false
+  reason: ""
+  questions: []
+
+notes:
+  - ""
+
+# ============================================================
+# 阻塞时使用以下格式
+# ============================================================
+# stage: "SYNTHESIS"
+# round: 1
+# status: "blocked"
+# can_continue: false
+# recommended_next_stage: ""
+#
+# outputs:
+#   current_view: ""
+#   evidence_ledger: ""
+#   synthesis_report: ""
+#
+# claim_summary:
+#   new_claims: 0
+#   updated_claims: 0
+#   contradicted_claims: 0
+#   application_usable_claims: 0
+#   helm_usable_claims: 0
+#
+# hypothesis_status:
+#   confirmed: 0
+#   partially: 0
+#   rejected: 0
+#   refined: 0
+#   unresolved: 0
+#
+# gap_status:
+#   high_confidence_gaps: 0
+#   medium_confidence_gaps: 0
+#   low_confidence_gaps: 0
+#   weakened_or_rejected_gaps: 0
+#
+# technical_inspirations:
+#   count: 0
+#   helm_candidate_count: 0
+#
+# skip_recommendations: []
+# new_research_needs: []
+#
+# ready_for_helm: false
+# helm_readiness:
+#   gate_1_core_gap_confirmed: false
+#   gate_2_nearest_neighbors_covered: false
+#   gate_3_landscape_clear: false
+#   gate_4_technical_alternatives: false
+#   gate_5_multi_round: false
+#   gate_6_marginal_gain_declining: false
+#   remaining_blockers:
+#     - "缺少必要输入。"
+#   reason: ""
+#
+# intervention:
+#   required: true
+#   reason: "缺少本轮 digest_report.md 或首轮基线文件。"
+#   questions:
+#     - "请先完成 04-paper-digest，生成本轮 digest_report.md。"
+#
+# notes:
+#   - ""

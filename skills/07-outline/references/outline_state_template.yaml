@@ -1,0 +1,144 @@
+# outline_state.yaml —— 逐 section / 逐 writing unit 写作状态追踪
+version: "3.1"
+project_title: ""
+template_source: ""
+last_updated: ""
+
+writing_constraints:
+  language: "zh-CN"
+  writing_granularity: "unit"
+  default_output_dir: "workflow/08_section_write/units"
+  section_assembly_dir: "workflow/09_section_assemble/sections"
+
+document_progress:
+  total_target_words: 0
+  total_written_words: 0
+  progress_pct: 0.0
+
+# ============================================================
+# sections：大纲标题树，最深 5 级
+#
+# - 每个 section（不论叶/非叶）至少 1 个 unit
+# - 非叶结点：有 children + 1 个 section_intro unit
+# - 叶结点（leaf section）：无 children，1+ 个 unit
+# - section ID 规范：S{num}.{num}.{num}.{num}.{num}，与层级对应
+# ============================================================
+sections:
+  - id: "S01"
+    heading: ""
+    heading_number: "1"             # 由 section_id 派生：去掉 "S" 前缀
+    level: 1
+    template_heading_original: ""
+    status: "pending"              # pending / in_progress / written / approved / blocked
+    blocked_reason: ""
+    priority: "high"
+    target_words: 0
+    written_words: 0
+    role_in_document: ""
+    is_leaf: false
+    children:
+      - id: "S01.1"
+        heading: ""
+        heading_number: "1.1"
+        level: 2
+        template_heading_original: ""
+        status: "pending"
+        blocked_reason: ""
+        priority: "low"
+        target_words: 0
+        written_words: 0
+        role_in_document: ""
+        is_leaf: true               # 叶结点示例
+        children: []
+        units:
+          - unit_id: "S01.1-U001"
+            title: ""
+            unit_type: "other"
+            is_first_unit_of_section: true
+            status: "pending"
+            blocked_reason: ""
+            priority: "low"
+            target_words: 300
+            written_words: 0
+            heading_level: 2        # 等于所属 section 的 level
+            heading_number: "1.1"   # 继承自所属 section
+            output_file: "workflow/08_section_write/units/S01.1-U001.md"
+            source_pack_file: ""
+            depends_on: []
+            feeds_into: []
+            writing_notes: ""
+
+    # ---- 非叶结点 unit（section_intro）----
+    # 每个非叶结点恰好 1 个 section_intro unit
+    units:
+      - unit_id: "S01-U001"
+        title: ""
+        unit_type: "section_intro"
+        is_first_unit_of_section: true
+        needs_intro_paragraph: false   # true=标题+简短开篇段落 / false=仅写标题
+        heading_number: "1"            # 继承自所属 section
+        status: "pending"
+        blocked_reason: ""
+        priority: "high"
+        target_words: 0                # needs_intro_paragraph=false 时为 0
+        written_words: 0
+        heading_level: 1               # 等于所属 section 的 level
+        output_file: "workflow/08_section_write/units/S01-U001.md"
+        source_pack_file: ""
+        depends_on: []
+        feeds_into: []
+        writing_notes: ""
+
+# ============================================================
+# unit_queue: 08-section-write 的写作顺序
+# 按深度优先排列所有 unit
+# ============================================================
+unit_queue:
+  next_unit_id: ""
+  priority_order:
+    - "S01-U001"
+    - "S01.1-U001"
+
+# ============================================================
+# section_index: 所有 section（含嵌套）的扁平索引
+# 供 08-section-write 和 auto 快速查找
+# ============================================================
+section_index:
+  S01:
+    id: "S01"
+    heading: ""
+    level: 1
+    is_leaf: false
+    parent_id: null
+    path: ["S01"]
+    children_ids: ["S01.1"]
+    unit_ids: ["S01-U001"]
+
+metadata:
+  total_sections: 0
+  total_leaf_sections: 0
+  total_units: 0
+  section_intro_units: 0              # needs_intro_paragraph=true 的 section_intro 数量
+  heading_only_units: 0               # needs_intro_paragraph=false 的 section_intro 数量
+  max_depth: 0                        # 大纲最大深度（1-5）
+  sections_by_status:
+    pending: 0
+    in_progress: 0
+    written: 0
+    approved: 0
+    blocked: 0
+  units_by_status:
+    pending: 0
+    in_progress: 0
+    written: 0
+    approved: 0
+    blocked: 0
+  units_by_priority:
+    high: 0
+    medium: 0
+    low: 0
+  blocked_units:
+    - unit_id: ""
+      reason: ""
+  progress_unit_pct: 0.0
+  progress_word_pct: 0.0

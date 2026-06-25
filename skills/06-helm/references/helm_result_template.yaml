@@ -1,0 +1,74 @@
+# ============================================================
+# 成功完成时使用以下格式
+# ============================================================
+stage: "HELM"
+status: "completed"
+can_continue: true
+recommended_next_stage: "OUTLINE"
+
+basis:
+  - "topic.md"
+  - "workflow/05_synthesis/current_view.md"
+
+outputs:
+  helm_report: "workflow/06_helm/helm_report.md"
+  scheme_blueprint: "workflow/06_helm/scheme_blueprint.yaml"
+  decision_log: "workflow/06_helm/decision_log.md"
+
+selected:
+  core_problem: ""
+  main_route: ""
+  research_content_count: 0
+
+quality:
+  focus_score: 0.0
+  completeness_score: 0.0
+  innovation_score: 0.0
+  feasibility_score: 0.0
+  validation_score: 0.0
+  outline_readiness: 0.0
+
+intervention:
+  required: false
+  reason: ""
+  questions: []
+
+notes:
+  - "本阶段完成整体方案规划，下一阶段应进入 07-outline。"
+
+# ============================================================
+# 阻塞时使用以下格式
+# ============================================================
+# stage: "HELM"
+# status: "blocked"
+# can_continue: false
+# recommended_next_stage: ""
+#
+# basis: []
+#
+# outputs:
+#   helm_report: ""
+#   scheme_blueprint: ""
+#   decision_log: ""
+#
+# selected:
+#   core_problem: ""
+#   main_route: ""
+#   research_content_count: 0
+#
+# quality:
+#   focus_score: 0.0
+#   completeness_score: 0.0
+#   innovation_score: 0.0
+#   feasibility_score: 0.0
+#   validation_score: 0.0
+#   outline_readiness: 0.0
+#
+# intervention:
+#   required: true
+#   reason: "缺少 topic.md 或 workflow/05_synthesis/current_view.md，无法规划整体方案。"
+#   questions:
+#     - "请先完成 05-synthesis，生成 workflow/05_synthesis/current_view.md。"
+#
+# notes:
+#   - ""

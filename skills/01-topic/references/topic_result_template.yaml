@@ -1,0 +1,58 @@
+# ============================================================
+# 成功完成时使用以下格式
+# ============================================================
+stage: "TOPIC_UNDERSTANDING"
+version: "v0"
+status: "completed"
+can_continue: true
+recommended_next_stage: "LITERATURE_PLAN"
+
+quality:
+  topic_confidence: 0.0
+  scenario_clarity: 0.0
+  problem_clarity: 0.0
+  background_clarity: 0.0
+  constraint_clarity: 0.0
+  literature_plan_readiness: 0.0
+
+intervention:
+  required: false
+  reason: ""
+  questions: []
+
+outputs:
+  topic_card: "workflow/01_topic/01_topic_card.md"
+  literature_seed: "workflow/01_topic/01_literature_seed.yaml"
+
+notes:
+  - "本阶段只完成初始课题理解，不代表完成系统文献综述、gap 分析或创新性判断。"
+
+# ============================================================
+# 课题信息严重不足 / topic.md 缺失或为空时使用以下格式
+# ============================================================
+# stage: "TOPIC_UNDERSTANDING"
+# version: "v0"
+# status: "blocked"
+# can_continue: false
+# recommended_next_stage: ""
+#
+# quality:
+#   topic_confidence: 0.0
+#   scenario_clarity: 0.0
+#   problem_clarity: 0.0
+#   background_clarity: 0.0
+#   constraint_clarity: 0.0
+#   literature_plan_readiness: 0.0
+#
+# intervention:
+#   required: true
+#   reason: "topic.md 缺失、为空，或无法判断课题方向"
+#   questions:
+#     - "请补充课题名称和原始描述。"
+#
+# outputs:
+#   topic_card: ""
+#   literature_seed: ""
+#
+# notes:
+#   - "需要用户补充 topic.md 后才能继续。"

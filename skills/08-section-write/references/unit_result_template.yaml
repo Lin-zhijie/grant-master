@@ -1,0 +1,53 @@
+stage: "SECTION_WRITE"
+status: "completed"
+can_continue: true
+recommended_next_stage: "SECTION_WRITE"
+
+this_unit:
+  unit_id: ""
+  title: ""
+  unit_type: ""                      # section_intro / background / related_work / gap / ...
+  section_id: ""                     # 所属 section ID（不论叶/非叶）
+  heading_level: 0                   # 输出标题级别
+  is_first_unit_of_section: true     # 是否所属 section 的第 1 个 unit（决定是否写标题）
+  is_heading_only: false             # section_intro 且 needs_intro_paragraph=false 时为 true
+  written_file: "workflow/08_section_write/units/{unit_id}.md"
+
+content_checklist:
+  - item: ""
+    source: ""                       # paragraph_slot / required_element / source
+    covered: true
+    note: ""
+
+progress:
+  total_units: 0
+  units_written: 0
+  units_pending: 0
+  units_blocked: 0
+  progress_pct: 0.0
+
+next_unit:
+  unit_id: ""
+  title: ""
+  status: "pending"
+
+outputs_updated:
+  - "workflow/08_section_write/units/{unit_id}.md"
+  - "workflow/07_outline/outline_state.yaml"
+
+warnings: []
+notes: []
+
+# ============================================================
+# 全部写完时
+# ============================================================
+# status: "all_complete"
+# recommended_next_stage: "REVIEW"
+# next_unit: { status: "none" }
+
+# ============================================================
+# 阻塞时
+# ============================================================
+# status: "blocked"
+# can_continue: false
+# intervention: { required: true, reason: "", questions: [] }

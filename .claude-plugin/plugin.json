@@ -1,0 +1,9 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "grant-master",
+  "version": "0.1.0",
+  "description": "TODO: describe what this plugin provides",
+  "skills": [
+    "./"
+  ]
+}
