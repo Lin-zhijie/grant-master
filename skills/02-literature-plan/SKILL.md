@@ -192,7 +192,7 @@ description: >
 | `plan_result.yaml` | `references/plan_result_template.yaml`（含成功/阻塞两种格式） |
 | `latest_plan.yaml` | `references/latest_plan_template.yaml` |
 
-模板文件位置：``
+模板文件位置：本 Skill 目录下的 `references/`（如 `skills/02-literature-plan/references/`）
 
 **按需读取**：只在即将写某个文件时读取对应模板，不要一开始把所有模板全部加载。
 

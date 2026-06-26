@@ -36,6 +36,8 @@ coordinator 传入：
 
 **你不负责**：跨 query 去重合并、生成最终 search_summary.md / candidate_papers.md / search_results.yaml、更新 proposal_state.yaml —— 都是 coordinator 的职责。
 
+> **路径基准**：instruction sheet 中的所有路径（`output.local_report`、`output.download_manifest`、`download_policy.target_dir`）均相对于**项目根目录**（`topic.md` 所在目录）。写文件前确认工作目录为项目根目录。
+
 ---
 
 ## 2. 启动时必须读取
@@ -44,8 +46,8 @@ coordinator 传入：
 
 | 顺序 | 文件 | 说明 |
 |------|------|------|
-| 1 | `references/academic-search/search-protocol.md` | **重要。完整读取。** |
-| 2 | `{instruction_sheet_path}`（coordinator 指定） | **重要。完整读取。** 本 query 的完整任务规格（YAML） |
+| 1 | `{instruction_sheet_path}`（coordinator 指定） | **重要。完整读取。** 本 query 的完整任务规格（YAML） |
+| 2 | `references/academic-search/search-protocol.md` | **重要。完整读取。** 搜索宪法（400+ 行） |
 | 3 | `references/academic-search/api-cookbook.md` | 按需 |
 | 4 | `references/academic-search/disciplines/{discipline}.md` | 按需 |
 | 5 | `references/academic-search/site-patterns/{domain}.md` | 按需 |

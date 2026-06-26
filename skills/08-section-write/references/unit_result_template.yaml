@@ -42,7 +42,7 @@ notes: []
 # 全部写完时
 # ============================================================
 # status: "all_complete"
-# recommended_next_stage: "REVIEW"
+# recommended_next_stage: "ASSEMBLE"
 # next_unit: { status: "none" }
 
 # ============================================================

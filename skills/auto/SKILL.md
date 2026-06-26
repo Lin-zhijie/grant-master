@@ -39,6 +39,26 @@ auto 在调用 subagent 时，**只允许使用本 plugin 定义的 worker agent
 
 各 coordinator skill（03/04/08）在 dispatch 时必须使用对应的 worker agent 类型**字符串字面量**，不允许动态推断或回退到通用型。
 
+### 1.2 铁律：路径基准——项目根目录
+
+**所有文件路径（instruction sheet 中的路径、agent 输出路径、mkdir 目标）均以项目根目录为基准。**
+
+项目根目录 = `topic.md` 所在目录（用户执行 grant 工作流的目录）。
+
+agent 启动后，**第一个文件操作之前**必须确认当前工作目录是项目根目录。若不确定，从 instruction sheet 中的 `round_dir` 推导：
+
+```
+round_dir = "workflow/04_paper_digest/round_01"
+→ 项目根 = 去掉 "workflow/..." 后的前缀
+```
+
+**禁止行为**：
+- agent 以自身所在目录（如 `~/.claude/skills/grant-master/agents/`）为基准解析路径
+- agent 以上一个文件操作后的残留 CWD 为基准
+- coordinator 在 instruction sheet 中使用 agent 本地路径
+
+**后果**：若 agent 从错误基准写文件，产物会出现在 `papers/inbox/workflow/...` 等错误嵌套路径中，后续阶段无法找到。
+
 ## 2. 状态文件
 
 auto **独享** `./workflow/proposal_state.yaml` 的读写权限。其他 XX-name skill **绝不**读取或修改此文件。

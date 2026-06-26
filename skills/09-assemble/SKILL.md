@@ -105,7 +105,7 @@ workflow/07_outline/source_allocation.yaml   # 如需检查证据一致性
 3. 注入缺失的标题编号（安全网）；
 4. 生成 proposal_draft.pdf（pandoc → HTML → weasyprint）；
 5. 执行基础质量检查并写入 assemble_report.md；
-6. 如果检查发现严重问题（如缺失 unit），报告问题但不阻塞输出。
+6. 如果检查发现缺失 unit，draft 仍生成（占位符，方便预览），但 `assemble_result.yaml` 中 `can_continue: false`、`missing_units > 0`，auto 不会进入 10-review。修复缺失后重新 assemble 才能通过门禁。
 
 ### 不允许做
 
@@ -183,7 +183,7 @@ S01
 
 | 情况 | 处理 |
 |---|---|
-| 某 unit 的 .md 文件不存在 | 记录到 `missing_units`，在对应位置插入 `> **[缺失：{unit_id} {title}]**` 占位标记 |
+| 某 unit 的 .md 文件不存在 | 记录到 `missing_units`（P0 级），在对应位置插入 `> **[缺失：{unit_id} {title}]**` 占位标记。`can_continue` 设为 `false` |
 | 某 unit 状态为 `blocked` | 同上 |
 | 某 unit 文件为空 | 记录警告，不插入占位 |
 
@@ -276,7 +276,7 @@ HTML('/tmp/proposal_full.html').write_pdf('workflow/09_assemble/proposal_draft.p
 
 | 检查项 | 方法 | 严重程度 |
 |---|---|---|
-| 所有 unit 是否都有 .md 文件 | 对比 outline_state 的 unit 列表与实际文件 | error（缺失 > 0 时不阻塞但标红） |
+| 所有 unit 是否都有 .md 文件 | 对比 outline_state 的 unit 列表与实际文件 | error（缺失 > 0 → can_continue: false，draft 含占位符供预览） |
 | 所有 unit 是否都有内容 | 检查文件大小 > 0 | warning |
 | 关键词是否全部覆盖 | 对比 outline_report.md §10 的禁写内容和关键术语 | info |
 
@@ -321,8 +321,8 @@ HTML('/tmp/proposal_full.html').write_pdf('workflow/09_assemble/proposal_draft.p
 ### 第 1 步：验证前提
 
 1. 读取 `outline_state.yaml`
-2. 检查所有 unit 状态：全部 `written` 或 `approved` 才可组装
-3. 如有 `pending` unit，报告警告但允许继续（用于预览模式）
+2. 检查所有 unit 状态：全部 `written` 或 `approved` → `can_continue: true`
+3. 如有 `pending` 或文件缺失的 unit → draft 仍生成（占位符预览），但 `can_continue: false`，`assemble_report.md` 中标明缺失清单。auto 读到 `can_continue: false` 时应停止，不进入 10-review
 
 ### 第 2 步：按 section tree 组装
 
@@ -412,7 +412,7 @@ workflow/09_assemble/
 2. 严格按 section tree 的 DFS 顺序拼接；
 3. 标题编号安全网必须执行——不得让缺少编号的标题进入 draft；
 4. 基础检查必须全部执行，不得跳过；
-5. 缺失 unit 不阻塞输出，但必须在报告中标红；
+5. 缺失 unit 时 draft 仍生成（占位符预览），但 `can_continue` 必须设为 `false`，阻止 auto 进入 10-review；
 6. PDF 生成为可选（weasyprint 不可用时跳过，不阻塞）；
 7. PDF 生成前必须检查 weasyprint 可用性，不可用时给出清晰提示；
 8. 最终响应中不要执行其他 Skill。

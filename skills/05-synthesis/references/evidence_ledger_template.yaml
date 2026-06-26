@@ -12,7 +12,7 @@ claims:
       - paper_id: ""
         title: ""
         round: 1
-        report: "workflow/04_paper_digest/round_01/papers/xxx.md"
+        report: "workflow/04_paper_digest/round_01/reports/Q1/papers/xxx.md"
         evidence_summary: ""
     related_tasks:
       - ""

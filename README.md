@@ -1,6 +1,6 @@
 # Grant Writing Plugin
 
-中文项目申请书全流程写作工具链。从课题分析到成稿输出，12 个阶段 + 自动编排器。
+中文项目申请书全流程写作工具链。从课题分析到成稿输出，11 个阶段 + auto（共 12 个 skill）。
 
 ## 安装
 
@@ -80,12 +80,13 @@ pip install python-docx       # 可选，用于模板填充式 docx
 ├── applicant_profile.md             # 申请人信息（可选）
 ├── references/
 │   └── Template.docx                # 申请书模板（可选，影响 07/11）
-├── proposal_state.yaml              # auto 状态文件（自动创建）
 ├── papers/
 │   ├── inbox/                       # 待精读论文
 │   └── proceeded/                   # 已精读论文
 └── workflow/
-    ├── 01_topic_card.md
+    ├── proposal_state.yaml          # auto 状态文件（自动创建）
+    ├── 01_topic/
+    │   └── 01_topic_card.md         # 课题初始理解卡片
     ├── 02_literature_plan/
     ├── 03_academic_search/
     ├── 04_paper_digest/

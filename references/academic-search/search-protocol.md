@@ -267,20 +267,21 @@ curl -s "https://api.semanticscholar.org/graph/v1/paper/{paper_id}/references?fi
 ### 开放 PDF 下载与 manifest 导出
 
 边界：
-- 只下载 `full_text_status="open_pdf"` 且存在 `pdf_url` 的论文
-- 不得调用 Sci-Hub、LibGen、shadow library、WebVPN、CARSI、Tor 或 Cloudflare 绕过工具
-- 遇到 `needs_institution`、`no_open_pdf`、`anti_bot_blocked` 等时，不下载，只写入 manifest 并说明原因
+- 优先下载 `full_text_status="open_pdf"` 且存在 `pdf_url` 的论文（arXiv 直链 > Unpaywall > 出版平台）
+- **允许并推荐**通过 Sci-Hub、LibGen 等来源获取 paywalled 的重要论文（core + needs_institution/no_open_pdf）
+- 下载失败的标注原因（`download_error`），不无限重试
 - 批量任务先生成 manifest，再由用户确认是否下载
 
 推荐流程：
 1. 通过 arXiv、Semantic Scholar、OpenAlex、Unpaywall、PubMed Central 判断 OA 状态和 pdf_url
-2. 调用 `scripts/academic-search/oa-pdf-download.mjs --input <metadata.json> --manifest <manifest.json>` 生成下载清单
-3. 用户确认后，调用 `scripts/academic-search/oa-pdf-download.mjs --input <metadata.json> --manifest <manifest.json> --download --out-dir <dir>` 下载
+2. 对 OA 论文：调用 `scripts/academic-search/oa-pdf-download.mjs` 直接下载
+3. 对 paywalled core 论文：搜索 Sci-Hub/LibGen 最新可用域名，尝试获取 PDF
+4. 生成下载 manifest，标注每篇的 download_source（arxiv / unpaywall / scihub / libgen）
 
 分工规则：
-- 用户要"找论文 / 筛论文 / 查引用 / 生成开放 PDF 清单" → 使用 Academic-Search
-- 用户要"尽可能下载这些 DOI 的 PDF / 多源下载 / Sci-Hub / LibGen" → 明确说明这超出边界，建议切换工具
-- 遇到 Elsevier、Wiley、Springer、ACS 等商业出版平台，先判定 OA 状态；若需机构访问，尝试 Sci-Hub / LibGen 后报告
+- 用户要"找论文 / 筛论文 / 查引用" → 使用 Academic-Search
+- 用户要"尽可能下载这些 DOI 的 PDF" → searcher 自动尝试 OA + Sci-Hub/LibGen，结果写入 manifest
+- 遇到 Elsevier、Wiley、Springer、ACS 等商业出版平台，先判定 OA 状态；非 OA 则通过 Sci-Hub / LibGen 获取
 
 ### BibTeX 导出
 

@@ -34,6 +34,8 @@ coordinator 传入：
 
 **你不负责**：移动 PDF、更新 paper_index.yaml、跨批次综合分析（coordinator 的 digest_report.md）。
 
+> **路径基准**：instruction sheet 中的所有路径均相对于**项目根目录**（`topic.md` 所在目录）。`mkdir` 和文件写入前确认工作目录为项目根目录。
+
 ---
 
 ## 2. 启动时必须读取
@@ -107,7 +109,7 @@ papers:
 output:
   batch_report: "workflow/04_paper_digest/round_01/reports/Q1/Q1_batch_report.md"
   batch_manifest: "workflow/04_paper_digest/round_01/reports/Q1/Q1_batch_manifest.yaml"
-  papers_dir: "workflow/04_paper_digest/round_01/reports/Q1/papers/"
+  paper_reports_dir: "workflow/04_paper_digest/round_01/reports/Q1/papers/"
 ```
 
 ---
@@ -120,7 +122,7 @@ Read `{batch_instruction_path}`。
 
 ### 第 2 步：创建输出目录
 
-`mkdir -p {output.papers_dir}`
+`mkdir -p {output.paper_reports_dir}`
 
 ### 第 3 步：逐篇精读（循环）
 
@@ -128,7 +130,7 @@ Read `{batch_instruction_path}`。
 
 1. Read PDF（`pdf_path`）
 2. 按 §6 的 7 节结构生成精读报告
-3. 写入 `{output.papers_dir}/{filename_no_ext}.md`
+3. 写入 `{output.paper_reports_dir}/{filename_no_ext}.md`
 
 若 PDF 无法读取：仍输出完整 7 节，每节标注"PDF 无法读取：{原因}"。
 
@@ -259,7 +261,7 @@ cross_paper_findings:
 output_files:
   batch_report: "workflow/04_paper_digest/round_01/reports/Q1/Q1_batch_report.md"
   batch_manifest: "workflow/04_paper_digest/round_01/reports/Q1/Q1_batch_manifest.yaml"
-  papers_dir: "workflow/04_paper_digest/round_01/reports/Q1/papers/"
+  paper_reports_dir: "workflow/04_paper_digest/round_01/reports/Q1/papers/"
 
 errors: []
 ```

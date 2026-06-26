@@ -199,7 +199,7 @@ workflow/05_synthesis/
 | `synthesis_result.yaml` | `references/synthesis_result_template.yaml`（含成功/阻塞两种格式） |
 | `latest_result.yaml` | `references/latest_result_template.yaml` |
 
-模板位置：``
+模板文件位置：本 Skill 目录下的 `references/`（如 `skills/05-synthesis/references/`）
 
 ### 5.1 evidence_ledger.yaml 的职责
 

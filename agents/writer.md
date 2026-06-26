@@ -34,6 +34,8 @@ coordinator 传入：
 
 **你不负责**：更新 outline_state.yaml、跨批次协调、合并组装、全局审阅。
 
+> **路径基准**：instruction sheet 中的所有路径均相对于**项目根目录**（`topic.md` 所在目录）。`mkdir` 和文件写入前确认工作目录为项目根目录。
+
 ---
 
 ## 2. 启动时必须读取

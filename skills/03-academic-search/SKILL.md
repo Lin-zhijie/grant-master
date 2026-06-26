@@ -348,7 +348,7 @@ errors: []
 
 1. Coordinator 不执行搜索——只编排和汇总
 2. Coordinator 不下载 PDF——searcher 负责下载
-3. 每条 query 生成的 instruction sheet 必须完整（含全部 6 个 top-level key）
+3. 每条 query 生成的 instruction sheet 必须完整（含全部 7 个 top-level key）
 4. dispatch 时只传数据和指令，不传搜索规则——searcher 自己读共享文件
 5. 所有 searcher 并行 dispatch（parallel_safe: true）
 6. 合并去重按 DOI → arXiv ID → 标题+年份优先级

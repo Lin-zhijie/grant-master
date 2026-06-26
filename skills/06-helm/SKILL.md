@@ -105,12 +105,12 @@ helm 想确认某个 gap 是否真的有证据
   ↓
 找到对应 claim 的 sources[].report 路径
   ↓
-读取该 report（如 workflow/04_paper_digest/round_02/papers/P003.md）
+读取该 report（如 workflow/04_paper_digest/round_02/reports/Q1/papers/P003.md）
 ```
 
 L3 文件池：
 ```text
-workflow/04_paper_digest/round_XX/papers/*.md         # 单篇精读报告
+workflow/04_paper_digest/round_XX/reports/{batch_id}/papers/*.md         # 单篇精读报告
 workflow/04_paper_digest/round_XX/digest_report.md    # 某轮综合精读报告
 workflow/03_academic_search/round_XX/search_summary.md
 workflow/03_academic_search/round_XX/candidate_papers.md
@@ -221,7 +221,7 @@ workflow/06_helm/
 | `decision_log.md` | `references/decision_log_template.md` |
 | `helm_result.yaml` | `references/helm_result_template.yaml`（含成功/阻塞两种格式） |
 
-模板文件位置：``
+模板文件位置：本 Skill 目录下的 `references/`（如 `skills/06-helm/references/`）
 
 **按需读取**：只在即将写某个文件时读取对应模板。
 

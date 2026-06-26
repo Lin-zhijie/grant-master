@@ -194,7 +194,7 @@ template_status: "fallback_builtin_outline"
 可追溯文件池：
 
 ```text
-workflow/04_paper_digest/round_XX/papers/*.md
+workflow/04_paper_digest/round_XX/reports/{batch_id}/papers/*.md
 workflow/04_paper_digest/round_XX/digest_report.md
 workflow/05_synthesis/round_XX/synthesis_report.md
 workflow/03_academic_search/round_XX/candidate_papers.md

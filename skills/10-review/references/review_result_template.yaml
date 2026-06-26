@@ -42,12 +42,10 @@ findings:
   P1_strongly_recommended: []
   P2_optimization: []
 
-summary:
-  total_issues: 0
-  P0_count: 0
-  P1_count: 0
-  P2_count: 0
-  ready_for_output: false           # P0=0 时为 true
+P0_count: 0                         # 11-output / auto 直接读取
+P1_count: 0
+P2_count: 0
+ready_for_output: false             # P0=0 时为 true
 
 warnings: []
 notes: []

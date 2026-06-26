@@ -8,7 +8,7 @@ writing_constraints:
   language: "zh-CN"
   writing_granularity: "unit"
   default_output_dir: "workflow/08_section_write/units"
-  section_assembly_dir: "workflow/09_section_assemble/sections"
+  section_assembly_dir: "workflow/09_assemble"
 
 document_progress:
   total_target_words: 0

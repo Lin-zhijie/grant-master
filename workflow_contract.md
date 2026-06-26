@@ -8,7 +8,7 @@
 
 ### 1.1 auto 的定位
 
-> auto 只做路由 + 验证，不做决策。各 skill 的 result 文件是唯一的真相来源。proposal_state.yaml 只记录"已验证的事实"，不记录"auto 希望的事实"。
+> auto 只做路由 + 验证，不做决策。各 skill 的 result 文件是唯一的真相来源。./workflow/proposal_state.yaml 只记录"已验证的事实"，不记录"auto 希望的事实"。
 
 ### 1.2 不可跳过的阶段
 
@@ -22,7 +22,7 @@
 
 | 循环 | 最少次数 | 来源 |
 |------|---------|------|
-| 调研循环 (02→03→04→05) | 由 `config.min_rounds` 定义 | 用户启动参数 / proposal_state.yaml config |
+| 调研循环 (02→03→04→05) | 由 `config.min_rounds` 定义 | 用户启动参数 / ./workflow/proposal_state.yaml config |
 | 审阅修复循环 (10→08→09→10) | 不限，P0 > 0 时必须继续 | review_result.yaml |
 
 ---
@@ -37,7 +37,7 @@
 
 当上下文压力过大时，auto 只能执行以下动作：
 
-1. **write_checkpoint**：将当前状态完整写入 `proposal_state.yaml`，确保所有已完成阶段有 `completed_at` 时间戳
+1. **write_checkpoint**：将当前状态完整写入 `./workflow/proposal_state.yaml`，确保所有已完成阶段有 `completed_at` 时间戳
 2. **summarize_current_state**：生成简洁的当前状态摘要，告知用户已完成什么、下一步是什么
 3. **stop_and_request_resume**：停止自动推进，明确告诉用户"请在新 session 中 `/grant-master:auto 继续`"
 
@@ -57,7 +57,7 @@
 
 | 违规类型 | 检测方法 |
 |---------|---------|
-| skip_required_stage | 检查 `proposal_state.yaml` 中 stage 的 `completed_at` 时间戳是否连续（不应有跳过） |
+| skip_required_stage | 检查 `./workflow/proposal_state.yaml` 中 stage 的 `completed_at` 时间戳是否连续（不应有跳过） |
 | mark_unrun_stage_completed | 检查对应阶段的 `required_outputs` 文件是否全部存在且非空 |
 | invent_round_completion | 检查 `workflow/02-05/` 对应轮次目录及 result 文件是否存在 |
 | write_result_without_outputs | 各 skill 的 result 文件中的 `integrity.all_outputs_present` 字段是否为 `true` |
@@ -170,7 +170,7 @@ stage_outputs:
 
 ### 4.2 关键约束
 
-- `research_loop.rounds_completed`：**必须由 05-synthesis 在 `synthesis_result.yaml` 中写入**，auto 只从该文件读取并同步到 proposal_state.yaml
+- `research_loop.rounds_completed`：**必须由 05-synthesis 在 `synthesis_result.yaml` 中写入**，auto 只从该文件读取并同步到 ./workflow/proposal_state.yaml
 - `quality.*`：**必须由对应阶段的 skill 在 result 文件中写入**，auto 只汇总，不得自行修改
 - `stages.*.status`：auto 只有在验证 `required_outputs` 全部存在后才能标记为 `completed`
 
@@ -200,7 +200,7 @@ stage_outputs:
 
 auto 检测到非法跳跃时：
 1. 不执行目标阶段
-2. 记录警告到 proposal_state.yaml 的 history
+2. 记录警告到 ./workflow/proposal_state.yaml 的 history
 3. 在输出中明确告知用户跳过了哪些阶段
 4. 如果跳过的阶段在 `config.required_stages` 中 → **硬阻塞**，不允许继续
 

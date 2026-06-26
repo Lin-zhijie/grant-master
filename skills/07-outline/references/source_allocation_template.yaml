@@ -13,7 +13,7 @@ source_layers:
     - "workflow/05_synthesis/evidence_ledger.yaml"
     - "workflow/04_paper_digest/paper_index.yaml"
   L3_traceback:
-    - "workflow/04_paper_digest/round_XX/papers/*.md"
+    - "workflow/04_paper_digest/round_XX/reports/{batch_id}/papers/*.md"
     - "workflow/04_paper_digest/round_XX/digest_report.md"
     - "workflow/05_synthesis/round_XX/synthesis_report.md"
 

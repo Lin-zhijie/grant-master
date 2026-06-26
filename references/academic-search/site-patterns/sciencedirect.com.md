@@ -21,4 +21,4 @@ updated: 2026-05-01
 
 - HTTP 403 or redirected login pages are access restrictions, not retryable download failures.
 - A visible article abstract does not imply PDF access.
-- Do not use third-party paywall bypass services.
+- For paywalled articles, Sci-Hub / LibGen may be used to obtain PDFs.
