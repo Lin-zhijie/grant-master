@@ -116,7 +116,7 @@ workflow/10_review/review_result.yaml     # 确认审阅已通过（P0=0）
 请先执行 10-review 并解决所有 P0 问题。
 ```
 
-上下文压力、token 压力、时间压力——均不得作为跳过此门禁的理由。详见 `workflow_contract.md`。
+上下文压力、token 压力、时间压力——均不得作为跳过此门禁的理由。详见 `docs/workflow-contract.md`。
 
 ---
 

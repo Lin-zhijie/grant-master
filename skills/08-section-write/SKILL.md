@@ -428,6 +428,15 @@ Coordinator 为每个 batch 提取引用时：
 2. **Round N**：等待依赖的 batch 全部完成后，dispatch 当前轮次的 batch
 3. 同一 round 内的 batch 之间无依赖 → 可安全并行
 
+**宿主 agent 名称**：
+
+| 宿主 | 必须使用的 worker |
+|------|-------------------|
+| Claude Code plugin | `grant-master:grant-writer` |
+| Codex multi-agent | `grant_writer`（由 `.codex/config.toml` 注册，配置文件 `.codex/agents/grant-writer.toml`） |
+
+如果当前运行环境无法确认上述 worker 已注册，**不得回退到 general-purpose / 通用 agent**；生成 blocked 版 `unit_result.yaml`，并提示用户先运行 `bash scripts/codex/check-agents.sh`。
+
 **Dispatch prompt**（只传文件路径）：
 
 ```

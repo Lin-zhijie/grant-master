@@ -26,7 +26,7 @@ Files likely affected:
 - `agents/digester.md`
 - `skills/05-synthesis/SKILL.md`
 - `skills/07-outline/SKILL.md`
-- `workflow_contract.md`
+- `docs/workflow-contract.md`
 
 Open questions:
 

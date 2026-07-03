@@ -8,4 +8,4 @@ Academic-Search is licensed under the MIT License:
 Copyright (c) 2026 Chengmingyue
 ```
 
-See the repository-level `THIRD_PARTY_NOTICES.md` for the full third-party notice and license text.
+See `docs/third-party-notices.md` for the full third-party notice and license text.

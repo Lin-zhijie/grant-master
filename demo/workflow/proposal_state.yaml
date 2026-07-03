@@ -2,7 +2,7 @@
 # 放在项目根目录，由 auto 独享读写
 # 各阶段 skill 不读取此文件
 #
-# 字段权限分类（详见 workflow_contract.md §4）：
+# 字段权限分类（详见 docs/workflow-contract.md §4）：
 #   config   —— 启动时由 auto 写入一次，之后只读
 #   pipeline —— auto 写入，但仅在独立验证 result 文件后
 #   evidence —— 各 skill 在其 result 文件中写入，auto 只汇总

@@ -161,6 +161,15 @@ output:
 
 所有 query 的 `grant-searcher` agent 同时 dispatch。
 
+**宿主 agent 名称**：
+
+| 宿主 | 必须使用的 worker |
+|------|-------------------|
+| Claude Code plugin | `grant-master:grant-searcher` |
+| Codex multi-agent | `grant_searcher`（由 `.codex/config.toml` 注册，配置文件 `.codex/agents/grant-searcher.toml`） |
+
+如果当前运行环境无法确认上述 worker 已注册，**不得回退到 general-purpose / 通用 agent**；生成 blocked 版 `search_result.yaml`，并提示用户先运行 `bash scripts/codex/check-agents.sh`。
+
 **Dispatch prompt 模板**（只传文件路径，不贴 YAML 正文）：
 
 ```

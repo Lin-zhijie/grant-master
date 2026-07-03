@@ -148,6 +148,15 @@ output:
 
 文件写完后，所有批次并行 dispatch。
 
+**宿主 agent 名称**：
+
+| 宿主 | 必须使用的 worker |
+|------|-------------------|
+| Claude Code plugin | `grant-master:grant-digester` |
+| Codex multi-agent | `grant_digester`（由 `.codex/config.toml` 注册，配置文件 `.codex/agents/grant-digester.toml`） |
+
+如果当前运行环境无法确认上述 worker 已注册，**不得回退到 general-purpose / 通用 agent**；生成 blocked 版 `digest_result.yaml`，并提示用户先运行 `bash scripts/codex/check-agents.sh`。
+
 **Dispatch prompt**（只传文件路径，不贴 YAML 正文）：
 
 ```

@@ -1,0 +1,23 @@
+# Grant-Master Codex reference configuration.
+#
+# Keep this file project-local. It registers the worker roles that the
+# coordinator skills use when running under Codex multi-agent mode.
+
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 6
+max_depth = 1
+
+[agents.grant_searcher]
+description = "Grant-Master academic search worker. Executes one search instruction sheet and writes local reports/manifests."
+config_file = "agents/grant-searcher.toml"
+
+[agents.grant_digester]
+description = "Grant-Master paper digest worker. Digests one batch instruction sheet and writes paper/batch reports."
+config_file = "agents/grant-digester.toml"
+
+[agents.grant_writer]
+description = "Grant-Master writing worker. Expands one section-writing batch instruction sheet into unit markdown files."
+config_file = "agents/grant-writer.toml"
