@@ -3,7 +3,8 @@
 #   - Codex multi-agent : .codex/config.toml + .codex/agents/*.toml
 #   - Claude Code plugin: .claude-plugin/plugin.json `agents` array + agents/*.md
 # A coordinator skill (auto/03/04/08) that cannot confirm a worker is registered
-# must generate a blocked result and point the user here.
+# must first run scripts/codex/register-agents.sh, then generate a blocked result
+# if registration/verification still fails.
 set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -33,6 +34,15 @@ check_file     "${ROOT_DIR}/.codex/agents/grant-writer.toml"    "writer toml"
 check_pattern  "${ROOT_DIR}/.codex/agents/grant-searcher.toml" 'agents/searcher\.md' "searcher.toml → searcher.md"
 check_pattern  "${ROOT_DIR}/.codex/agents/grant-digester.toml" 'agents/digester\.md' "digester.toml → digester.md"
 check_pattern  "${ROOT_DIR}/.codex/agents/grant-writer.toml"   'agents/writer\.md'   "writer.toml → writer.md"
+check_pattern  "${ROOT_DIR}/.codex/agents/grant-searcher.toml" '^model[[:space:]]*=[[:space:]]*"gpt-5\.5"' "searcher explicit model"
+check_pattern  "${ROOT_DIR}/.codex/agents/grant-digester.toml" '^model[[:space:]]*=[[:space:]]*"gpt-5\.5"' "digester explicit model"
+check_pattern  "${ROOT_DIR}/.codex/agents/grant-writer.toml"   '^model[[:space:]]*=[[:space:]]*"gpt-5\.5"' "writer explicit model"
+
+echo "=== Codex user registration helper ==="
+check_file     "${ROOT_DIR}/scripts/codex/register-agents.sh" "register-agents.sh"
+check_pattern  "${ROOT_DIR}/scripts/codex/register-agents.sh" 'agents\.grant_searcher' "registers grant_searcher"
+check_pattern  "${ROOT_DIR}/scripts/codex/register-agents.sh" 'agents\.grant_digester' "registers grant_digester"
+check_pattern  "${ROOT_DIR}/scripts/codex/register-agents.sh" 'agents\.grant_writer'   "registers grant_writer"
 
 echo "=== Claude Code plugin ==="
 check_file     "${CLAUDE_PLUGIN}"                                  "plugin.json"

@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "description": "中文项目申请书全流程自动撰写插件，覆盖课题理解、文献调研、方案收敛、大纲规划、正文写作、组装审阅与 docx 输出。",
   "author": {
-    "name": "lin"
+    "name": "lin",
+    "url": "https://github.com/Lin-zhijie"
   },
+  "homepage": "https://github.com/Lin-zhijie/grant-master",
+  "repository": "https://github.com/Lin-zhijie/grant-master",
   "license": "MIT",
   "keywords": [
     "grant",
@@ -25,11 +28,17 @@
       "Research",
       "Interactive"
     ],
+    "websiteURL": "https://github.com/Lin-zhijie/grant-master",
+    "privacyPolicyURL": "https://github.com/Lin-zhijie/grant-master/blob/main/SECURITY.md",
+    "termsOfServiceURL": "https://github.com/Lin-zhijie/grant-master/blob/main/LICENSE",
     "defaultPrompt": [
       "使用 grant-master:auto 推进申请书工作流",
       "使用 grant-master:08-section-write 写作正文单元",
       "使用 grant-master:10-review 审阅申请书草稿"
     ],
+    "composerIcon": "./assets/grant-master.svg",
+    "logo": "./assets/app-icon.png",
+    "screenshots": [],
     "brandColor": "#2563EB"
   }
 }

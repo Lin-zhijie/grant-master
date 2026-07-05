@@ -46,35 +46,51 @@ If you want a Kami-style preview gallery, add three screenshots: a `current_view
 
 ### Install
 
-Grant-Master is a plugin / skill collection. The repository includes manifests for Codex and Claude Code:
+#### Codex
 
-- [.codex-plugin/plugin.json](.codex-plugin/plugin.json)
-- [.claude-plugin/plugin.json](.claude-plugin/plugin.json)
+Let Codex install the plugin for you. Start a new Codex conversation and send this request:
 
-For Codex, import this repository as a Codex plugin. After installation, test it in any proposal workspace:
+```text
+Please install the Grant-Master Codex plugin from https://github.com/Lin-zhijie/grant-master. Clone the repository, run scripts/install-codex.sh, or scripts/install-codex.ps1 on Windows, and tell me whether installation succeeded.
+```
+
+If you have already cloned the repository, run this from the repository root:
+
+```bash
+bash scripts/install-codex.sh
+```
+
+Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-codex.ps1
+```
+
+For detailed installation behavior and troubleshooting, see the Chinese [Codex Desktop install guide](docs/install-codex.md).
+
+After installation, test it in any proposal workspace:
 
 ```text
 /grant-master:auto 状态
 ```
 
-Codex auto orchestration depends on this repository's project-local multi-agent configuration:
+#### Claude Code CLI
 
-```bash
-bash scripts/codex/check-agents.sh
-```
-
-The check confirms that `.codex/config.toml` registers the `grant_searcher`, `grant_digester`, and `grant_writer` worker roles. If you copy Grant-Master into another project or install only the skill files, keep the `.codex/` directory as well; otherwise stages 03/04/08 will block instead of falling back to a generic agent.
-
-For local Claude Code usage:
+Download or clone the project:
 
 ```bash
 git clone <repo-url> grant-master
-PLUGIN_DIR="$HOME/.claude/skills/grant-master"
-mkdir -p "$PLUGIN_DIR"
-cp -a grant-master/. "$PLUGIN_DIR"/
 ```
 
-Base dependencies:
+Create an empty plugin at `~/.claude/skills/grant-master`:
+
+```bash
+claude plugin init grant-master
+```
+
+Then move all files from this project into the newly created plugin.
+
+#### Dependencies
 
 ```bash
 sudo apt install pandoc curl

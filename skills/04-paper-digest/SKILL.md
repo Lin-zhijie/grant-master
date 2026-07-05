@@ -153,9 +153,15 @@ output:
 | 宿主 | 必须使用的 worker |
 |------|-------------------|
 | Claude Code plugin | `grant-master:grant-digester` |
-| Codex multi-agent | `grant_digester`（由 `.codex/config.toml` 注册，配置文件 `.codex/agents/grant-digester.toml`） |
+| Codex multi-agent | `grant_digester`（由 `scripts/codex/register-agents.sh` 注册到用户级 `~/.codex/config.toml`；仓库内 `.codex/config.toml` 是 reference configuration） |
 
-如果当前运行环境无法确认上述 worker 已注册，**不得回退到 general-purpose / 通用 agent**；生成 blocked 版 `digest_result.yaml`，并提示用户先运行 `bash scripts/codex/check-agents.sh`。
+Codex 下，在 dispatch 前先定位本 plugin 根目录并运行：
+
+```bash
+bash <plugin_root>/scripts/codex/register-agents.sh
+```
+
+如果注册脚本不存在、执行失败，或当前运行环境仍无法确认上述 worker 已注册，**不得回退到 general-purpose / 通用 agent**；生成 blocked 版 `digest_result.yaml`，并提示用户在插件根目录手动运行 `bash scripts/codex/register-agents.sh` 后重启 Codex 桌面端或开启新会话。
 
 **Dispatch prompt**（只传文件路径，不贴 YAML 正文）：
 
